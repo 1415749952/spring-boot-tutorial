@@ -98,6 +98,29 @@ public class HelloSpringBootController {
 
 至此，使用 SpringBoot 编写的第一个接口就完成了。
 
+### 打包部署
+
+在 IDE 中，我们可以使用 main 方法直接运行项目，但是将项目部署至服务器上运行，则不能如此。SpringBoot 提供了一个 Maven 插件，用于将项目要包成一个可以执行的 jar 包。
+
+在 pom.xml 中添加 Maven 插件
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+```
+
+执行 maven install 后，项目会被打包成 jar 包，通过如下命令即可启动项目
+
+```
+java -jar chapter1-1.0.0-SNAPSHOT.jar
+```
+
 ### 代码地址
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
@@ -106,4 +129,4 @@ public class HelloSpringBootController {
 
 使用 SpringBoot 搭建 Web 项目，其实内部还是 SpringMVC，但是，
 使用 SpringBoot 搭建 Web 项目比起曾经使用 SpringMVC 一步一步搭建项目明显快捷得多。
-所以，SpringBoot 并不是什么新技术，只是一个开发的脚手架。
+所以，SpringBoot 并不是什么新技术，只是一个开发的脚手架，帮助开发者更快速地开发。

@@ -98,5 +98,12 @@ public class HelloSpringBootController {
 
 至此，使用 SpringBoot 编写的第一个接口就完成了。
 
-比起曾经使用 SpringMVC 一步一步搭建项目明显快捷得多。
+### 代码地址
 
+本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
+
+### 总结
+
+使用 SpringBoot 搭建 Web 项目，其实内部还是 SpringMVC，但是，
+使用 SpringBoot 搭建 Web 项目比起曾经使用 SpringMVC 一步一步搭建项目明显快捷得多。
+所以，SpringBoot 并不是什么新技术，只是一个开发的脚手架。

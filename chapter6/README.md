@@ -109,6 +109,11 @@ public class UserController {
 
 一个安全的接口需要对每一个入参进行校验，以保证参数合法性。
 
+### 参考资料
+
+ - <http://www.cnblogs.com/mr-yang-localhost/p/7812038.html>
+ - <https://blog.csdn.net/qq_22845447/article/details/84034289>
+
 ### 扩展
 
 #### 自定义校验

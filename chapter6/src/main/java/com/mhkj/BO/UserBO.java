@@ -1,5 +1,6 @@
 package com.mhkj.BO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mhkj.validator.ValueRange;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,7 @@ public class UserBO {
      * 出生日期，格式为 yyyy-MM-dd，必须为过去的日期，不必须参数
      */
     @Past(message = "出生日期必须早于当前日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate birthday;
 
     /**

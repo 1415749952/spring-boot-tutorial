@@ -46,7 +46,7 @@ public class UserBO {
      * 出生日期，格式为 yyyy-MM-dd，必须为过去的日期，不必须参数
      */
     @Past(message = "出生日期必须早于当前日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate birthday;
 
     /**
@@ -63,14 +63,25 @@ public class UserBO {
 
 #### 在接口处使用校验
 
-在参数前面添加 @Valid 注解，通过 BindingResult 对象接收校验结果
+在参数前面添加 @Valid 注解，如果需要获取校验结果，则可以在最后一个参数使用 BindingResult 对象获取校验结果，否则，框架会抛出相应的异常，可以通过框架的异常处理机制进行统一处理。
 
 ```java
 @RestController
 public class UserController {
 
+    /**
+     * 如果校验失败，抛出异常
+     */
     @RequestMapping("/register")
-    public String doRegister(@Valid UserBO bo, BindingResult result) {
+    public String doRegister(@RequestBody @Valid UserBO bo) {
+        return "success";
+    }
+
+    /**
+     * 如果校验失败，希望自行对结果进行处理，则使用 BindingResult 对象接收校验结果
+     */
+    @RequestMapping("/register1")
+    public String doRegister1(@RequestBody @Valid UserBO bo, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder sb = new StringBuilder();
             List<FieldError> fieldErrors = result.getFieldErrors();
@@ -88,7 +99,7 @@ public class UserController {
 
 ### 验证结果
 
-启动服务，访问地址 `http://localhost:8080/register?username=1&birthday=2020-01-01&level=6`，可以看到校验失败的错误提示。
+启动服务，使用 postman 分别访问 `/register` 及 `/register1`，查看返回结果。
 
 ### 源码地址
 

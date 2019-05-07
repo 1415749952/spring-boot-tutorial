@@ -1,4 +1,4 @@
-第六章：SpringBoot项目中使用hibernate-validator检查参数
+第六章：SpringBoot整合hibernate-validator参数校验
 ---
 
 `spring-boot-starter-web` 项目中默认已经集成了 `hibernate-validator`

@@ -92,7 +92,7 @@ SpringBoot 还提供了其它启动方式，并且可以设置启动参数及配
 #### 启动项目
 
 在 Application 类上右键，选择 Run Application，项目正式启动，查看启动日志，可以看到 SpringBoot 项目默认使用 tomcat 容器，启动端口为 8080。
-访问地址`http://localhost:8080/hello`，可以看到输出`Hello SpringBoot`。
+访问地址 `http://localhost:8080/hello`，可以看到输出 `Hello SpringBoot`。
 
 ### 代码地址
 

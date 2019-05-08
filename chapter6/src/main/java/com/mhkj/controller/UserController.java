@@ -1,41 +1,42 @@
 package com.mhkj.controller;
 
-import com.mhkj.BO.UserBO;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.mhkj.entity.User;
+import com.mhkj.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
-    /**
-     * 如果校验失败，抛出异常
-     */
-    @RequestMapping("/register")
-    public String doRegister(@RequestBody @Valid UserBO bo) {
-        return "success";
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostMapping("/add")
+    public List<User> add(User user) {
+        userRepository.save(user);
+        return userRepository.findAll();
     }
 
-    /**
-     * 如果校验失败，希望自行对结果进行处理，则使用 BindingResult 对象接收校验结果
-     */
-    @RequestMapping("/register1")
-    public String doRegister1(@RequestBody @Valid UserBO bo, BindingResult result) {
-        if (result.hasErrors()) {
-            StringBuilder sb = new StringBuilder();
-            List<FieldError> fieldErrors = result.getFieldErrors();
-            for (FieldError fieldError : fieldErrors) {
-                sb.append(fieldError.getDefaultMessage());
-                sb.append(",");
-            }
-            return sb.toString();
-        }
-        return "success";
+    @PostMapping("/delete")
+    public List<User> delete(Long id) {
+        userRepository.deleteById(id);
+        return userRepository.findAll();
+    }
+
+    @PostMapping("/list")
+    public List<User> list() {
+        return userRepository.findAll();
+    }
+
+    @PostMapping("/update")
+    public List<User> update(User user) {
+        userRepository.save(user);
+        return userRepository.findAll();
     }
 
 }

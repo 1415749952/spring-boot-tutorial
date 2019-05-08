@@ -1,105 +1,181 @@
-第六章：SpringBoot整合hibernate-validator参数校验
+第六章：SpringBoot集成Lombok让项目更简洁
 ---
 
-`spring-boot-starter-web` 项目中默认已经集成了 `hibernate-validator`
+在上一章中，我们使用 SpringBoot 集成 JPA 进行对数据库表的 CURD 操作，在创建表所对应的实体时，需要为实体所有的字段生成 get / set 方法。
+这部分代码格式固定，每次都修改都需要重新生成，而且非常占地方，影响代码可看性。
+Lombok 就是为了解决这个问题。
 
-### 相关知识
+### Lombok简介
+
+Lombok官网：<https://projectlombok.org/>
+
+#### 常用注解
+
+一、@Setter | @Getter
+
+提供无参构造方法以及 getter、setter 方法
 
 ```
-@AssertTrue     // 用于 boolean 字段，该字段只能为 true
-@AssertFalse    // 用于 boolean 字段，该字段只能为 false
-@DecimalMax     // 用于 Number 字段，只能小于或等于该值
-@DecimalMin     // 用于 Number 字段，只能大于或等于该值
-@Digits(integer=2,fraction=20) // 检查是否是数字，校验整数位及小数位
-@Future         // 检查该字段的日期是否是属于将来的日期
-@Length(min=2,max=6)           // 用于字符串，检查字段长度是否在指定范围内
-@Max            // 用于 Number 字段，只能小于或等于该值
-@Min            // 用于 Number 字段，只能大于或等于该值
-@NotNull        // 该字段不能为空
-@NotEmpty       // 用于字符串，该字段不能为空字符串
-@NotBlank       // 用于字符串，该字段不能为空字符串，忽略空格
-@Null           // 该字段必须为空
-@Size(min=2,max=4)  // 用于字符串、数组、集合、Map等，检查该字段的size是否在指定范围
-```
-
-### 课程目标
-
-学习在 SpringBoot 项目中如何使用 hibernate-validator 进行入参校验
-
-### 操作步骤
-
-#### 添加校验规则
-
-```java
 @Getter
 @Setter
-public class UserBO {
+public class User1 {
 
-    /**
-     * 用户名，长度在6-16个字符之间，必须参数
-     */
-    @NotBlank(message = "用户名不能为空")
-    @Length(min = 6, max = 16, message = "用户名长度必须在6-16个字符之间")
+    private Long id;
+
     private String username;
-
-    /**
-     * 出生日期，格式为 yyyy-MM-dd，必须为过去的日期，不必须参数
-     */
-    @Past(message = "出生日期必须早于当前日期")
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
-    private LocalDate birthday;
-
-    /**
-     * 等级，整数，0-5之间，必须参数
-     */
-    @NotNull(message = "用户等级不能为空")
-    @Min(value = 0, message = "用户等级最小为0")
-    @Max(value = 5, message = "用户等级最大为5")
-    @Digits(integer = 1, fraction = 0, message = "用户等级必须为整数")
-    private Integer level;
 
 }
 ```
 
-#### 在接口处使用校验
+二、@ToString
 
-在参数前面添加 @Valid 注解，如果需要获取校验结果，则可以在最后一个参数使用 BindingResult 对象获取校验结果，否则，框架会抛出相应的异常，可以通过框架的异常处理机制进行统一处理。
+提供无参构造方法以及 toString 方法
 
-```java
+ - includeFieldNames 是否包含属性名
+ - exclude 排除指定属性
+ - callSuper 是否包含父类属性
+
+```
+@ToString
+public class User2 {
+
+    private Long id;
+
+    private String username;
+
+}
+```
+
+三、@EqualsAndHashCode
+
+提供无参构造方法以及 equals、hashCode 方法
+
+```
+@EqualsAndHashCode
+public class User3 {
+
+    private Long id;
+
+    private String username;
+
+}
+```
+
+四、@AllArgsConstructor
+
+提供一个全参数的构造方法，默认不提供无参构造
+
+```
+@AllArgsConstructor
+public class User4 {
+
+    private Long id;
+
+    private String username;
+
+}
+```
+
+五、@NoArgsConstructor
+
+提供一个无参构造
+
+```
+@NoArgsConstructor
+public class User5 {
+
+    private Long id;
+
+    private String username;
+
+}
+```
+
+六、@Data
+
+结合了@ToString，@EqualsAndHashCode，@Getter、@Setter、@NoArgsConstructor
+
+- staticConstructor 生成静态工厂方法的方法名，如果设置了该参数，则生成的无参构造方法将被置为私有的。
+
+```
+@Data
+public class User4 {
+
+    private Long id;
+
+    private String username;
+
+}
+```
+
+七、@Slf4j
+
+提供 org.slf4j.Logger 变量，变量名为 log
+
+```
+@Slf4j
 @RestController
 public class UserController {
 
-    /**
-     * 如果校验失败，抛出异常
-     */
-    @RequestMapping("/register")
-    public String doRegister(@RequestBody @Valid UserBO bo) {
-        return "success";
+    @GetMapping("/listUser")
+    public List<User1> listUser() {
+        log.error("log with lombok");
+        return null;
     }
 
-    /**
-     * 如果校验失败，希望自行对结果进行处理，则使用 BindingResult 对象接收校验结果
-     */
-    @RequestMapping("/register1")
-    public String doRegister1(@RequestBody @Valid UserBO bo, BindingResult result) {
-        if (result.hasErrors()) {
-            StringBuilder sb = new StringBuilder();
-            List<FieldError> fieldErrors = result.getFieldErrors();
-            for (FieldError fieldError : fieldErrors) {
-                sb.append(fieldError.getDefaultMessage());
-                sb.append(",");
-            }
-            return sb.toString();
-        }
-        return "success";
-    }
+}
+```
+
+### 课程目标
+
+熟悉并学会使用 lombok，简化项目代码
+
+### 操作步骤
+
+#### 安装插件
+
+File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选项，再在右侧查询 lombok，点击安装。
+
+#### 构建项目
+
+在上一章的代码基础上进行操作
+
+#### 添加依赖
+
+添加对 lombok 的依赖
+
+```xml
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.16.22</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+#### 为实体类减负
+
+将 User 类的 get / set 方法全部删除，在类上添加注解 @Data，修改后的 User 类代码如下，可以看到整个类的代码变得非常清爽。
+
+```java
+@Data
+@Entity
+public class User {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private Integer sex;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
 
 }
 ```
 
 ### 验证结果
 
-启动服务，使用 postman 分别访问 `/register` 及 `/register1`，查看返回结果。
+同上一章一样，使用 postman 进行接口调用
 
 ### 源码地址
 
@@ -107,103 +183,4 @@ public class UserController {
 
 ### 总结
 
-一个安全的接口需要对每一个入参进行校验，以保证参数合法性。
-
-### 参考资料
-
- - <http://www.cnblogs.com/mr-yang-localhost/p/7812038.html>
- - <https://blog.csdn.net/qq_22845447/article/details/84034289>
-
-### 扩展
-
-#### 自定义校验
-
-1. 创建一个注解，其中 @Constraint 用于指向该注册将使用的自定义校验类
-
-```java
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-@Constraint(validatedBy = ValueRangeValidator.class)
-public @interface ValueRange {
-
-    String[] values();
-
-    String message() default "值不正确";
-
-    Class<?>[] groups() default { };
-
-    Class<? extends Payload>[] payload() default { };
-
-}
-```
-
-2. 创建自定义校验类
-
-```java
-public class ValueRangeValidator implements ConstraintValidator<ValueRange, Object> {
-
-    private String[] values;
-
-    @Override
-    public void initialize(ValueRange constraintAnnotation) {
-        values = constraintAnnotation.values();
-    }
-
-    /**
-     * 校验函数
-     */
-    @Override
-    public boolean isValid(Object value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
-        for (String s : values) {
-            if (Objects.equals(s, value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-}
-```
-
-3. 使用自定义校验
-
-```java
-@Getter
-@Setter
-public class UserBO {
-
-    /**
-     * 用户名，长度在6-16个字符之间，必须参数
-     */
-    @NotBlank(message = "用户名不能为空")
-    @Length(min = 6, max = 16, message = "用户名长度必须在6-16个字符之间")
-    private String username;
-
-    /**
-     * 出生日期，格式为 yyyy-MM-dd，必须为过去的日期，不必须参数
-     */
-    @Past(message = "出生日期必须早于当前日期")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthday;
-
-    /**
-     * 等级，整数，0-5之间，必须参数
-     */
-    @NotNull(message = "用户等级不能为空")
-    @Min(value = 0, message = "用户等级最小为0")
-    @Max(value = 5, message = "用户等级最大为5")
-    @Digits(integer = 1, fraction = 0, message = "用户等级必须为整数")
-    private Integer level;
-
-    /**
-     * 限定性别的值只能是 0、1、2
-     */
-    @ValueRange(values = {"0", "1", "2"})
-    private Integer sex;
-
-}
-```
+Lombok 只是为了减少一些无关紧要的代码，减少编码的工作量，并不会减少程序的复杂度。

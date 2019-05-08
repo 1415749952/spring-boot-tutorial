@@ -48,7 +48,7 @@
 
 1. 编写 controller 接口
 
-在 Application 类的当前目录或者子目录下创建类 HelloSpringBootController.java，内容如下：
+创建 HelloSpringBootController 类，内容如下：
 
 ```java
 @RestController
@@ -67,7 +67,9 @@ public class HelloSpringBootController {
 @GetMapping 相当于在 hello 方法上添加 `@RequestMapping(method = RequestMethod.GET)` 注解。
 
 
-2. 在 src/main/java 目录下创建 Application 类作为项目启动类，内容如下
+2. 编写项目启动类
+
+创建 Application 类，内容如下
 
 ```java
 @SpringBootApplication
@@ -81,19 +83,16 @@ public class Application {
 ```
 
 其中 @SpringBootApplication 注解用于标记该类为项目启动类，而 main 方法中使用 `SpringApplication.run(Application.class, args);` 进行项目启动。
-其实 SpringBoot 还提供了其它启动方式，并且可以设置启动参数及配置，但目前只要知道通过这样就可以启动 SpringBoot 项目即可。
+SpringBoot 还提供了其它启动方式，并且可以设置启动参数及配置，但目前只要知道通过这样就可以启动 SpringBoot 项目即可。
 
 > 至此，项目已经搭建完毕，通过执行启动类的 main 方法即可以启动 SpringBoot 的 Web 项目了。
 
-**启动项目**
-
-在 Application 类上右键，选择 Run Application，项目正式启动，查看启动日志，可以看到 SpringBoot 项目默认使用 tomcat 容器，启动端口为 8080。
-
 ### 验证结果
 
-重新启动项目，访问地址`http://localhost:8080/hello`，可以看到输出`Hello SpringBoot`。
+#### 启动项目
 
-至此，使用 SpringBoot 编写的第一个接口就完成了。
+在 Application 类上右键，选择 Run Application，项目正式启动，查看启动日志，可以看到 SpringBoot 项目默认使用 tomcat 容器，启动端口为 8080。
+访问地址`http://localhost:8080/hello`，可以看到输出`Hello SpringBoot`。
 
 ### 代码地址
 

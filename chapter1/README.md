@@ -46,7 +46,28 @@
 
 #### 编码
 
-在 src/main/java 目录下创建 Application 类作为项目启动类，内容如下
+1. 编写 controller 接口
+
+在 Application 类的当前目录或者子目录下创建类 HelloSpringBootController.java，内容如下：
+
+```java
+@RestController
+public class HelloSpringBootController {
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello SpringBoot";
+    }
+
+}
+```
+
+其中，
+@RestController 相当于在 HelloSpringBootController 类上添加 @Controller 注解，以及对类中每一个方法添加 @ResponseBody 注解。
+@GetMapping 相当于在 hello 方法上添加 `@RequestMapping(method = RequestMethod.GET)` 注解。
+
+
+2. 在 src/main/java 目录下创建 Application 类作为项目启动类，内容如下
 
 ```java
 @SpringBootApplication
@@ -67,26 +88,6 @@ public class Application {
 **启动项目**
 
 在 Application 类上右键，选择 Run Application，项目正式启动，查看启动日志，可以看到 SpringBoot 项目默认使用 tomcat 容器，启动端口为 8080。
-
-编写 controller 接口
-
-在 Application 类的当前目录或者子目录下创建类 HelloSpringBootController.java，内容如下：
-
-```java
-@RestController
-public class HelloSpringBootController {
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello SpringBoot";
-    }
-
-}
-```
-
-其中，
-@RestController 相当于在 HelloSpringBootController 类上添加 @Controller 注解，以及对类中每一个方法添加 @ResponseBody 注解。
-@GetMapping 相当于在 hello 方法上添加 `@RequestMapping(method = RequestMethod.GET)` 注解。
 
 ### 验证结果
 

@@ -1,4 +1,4 @@
-第七章：SpringBoot全局异常处理
+第九章：SpringBoot全局异常处理
 ---
 
 在上一章，我们使用了 hibernate-validator 对参数进行校验，

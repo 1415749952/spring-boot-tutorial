@@ -1,13 +1,15 @@
 第二章：SpringBoot集成SpringBootJPA完成CURD
 ---
 
+在第一章中，我们使用 SpringBoot 创建了一个最简单的 Web 项目，这一章将在第一章的基础上，实现对数据库的操作。
+
 ### 课程目标
 
-在第一章中，我们使用 SpringBoot 创建了一个最简单的 Web 项目，这一章将在第一章的基础上，完成跟数据库的结合，实现对数据库表的增删查改操作。
+整合 SpringBootJPA，实现对 mysql 数据库表的增删查改操作。
 
 ### 操作步骤
 
-#### 创建表
+#### 初始化数据库
 
 在 mysql 的 test 库中创建表 user，脚本如下，其中主键设置为自动增长。
 
@@ -22,42 +24,40 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
 ```
 
-#### 构建项目
-
-通过 File -> New -> Module，选择创建一个 Maven 项目。
-
-```
-<groupId>com.mhkj.course</groupId>
-<artifactId>chapter2</artifactId>
-<version>1.0.0-SNAPSHOT</version>
-```
-
 #### 添加依赖
 
-在 pom.xml 中，添加项目依赖，
-
- - 因为是 web 项目，添加对 `spring-boot-starter-web` 的依赖。
- - 因为需要使用 mysql 数据库，添加对 `mysql-connector-java` 的依赖
- - 因为需要使用 JPA 作为持久层，添加对 `spring-boot-starter-data-jpa` 的依赖
+引入 Spring Boot Starter 父工程
 
 ```xml
-<dependency>
+<parent>
     <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-</dependency>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.0.5.RELEASE</version>
+</parent>
 ```
 
-#### 配置数据源
+引入 `spring-boot-starter-web`、`spring-boot-starter-data-jpa`、`mysql` 的依赖
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+</dependencies>
+```
+
+#### 配置
 
 SpringBoot 的默认配置文件为 application.properties(或者 application.yml)，本课程使用 application.yml。
 
@@ -80,9 +80,9 @@ spring:
       ddl-auto: none
 ```
 
-#### 创建实体
+#### 编码
 
-创建实体类 User
+编写实体类 User
 
  - 类上添加注解 @Entity
  - 主键添加注解 @Id
@@ -105,7 +105,7 @@ public class User {
 }
 ```
 
-#### 创建 Repository
+编写 Repository 类
 
 JPA 提供的 JpaRepository 接口已经实现了对单表的增删查改操作以及一些其它常用的方法。
 
@@ -115,7 +115,7 @@ JPA 提供的 JpaRepository 接口已经实现了对单表的增删查改操作�
 public interface UserRepository extends JpaRepository<User, Long> {}
 ```
 
-#### 创建前端交互接口
+编写 Controller 接口
 
 创建 controller 类，实现增删查改交换接口
 

@@ -59,9 +59,11 @@ CREATE TABLE `user` (
 
 #### 配置
 
-SpringBoot 的默认配置文件为 application.properties(或者 application.yml)，本课程使用 application.yml。
+> SpringBoot 默认使用 application.properties(或者 application.yml)作为项目配置文件，本课程使用 application.yml。
 
-在 src/main/resources 目录下添加 application.yml 文件，在文件中添加如下配置
+在 src/main/resources 目录下添加 application.yml 文件。
+
+配置数据源及 JPA 相关配置
 
 ```yaml
 spring:
@@ -82,7 +84,7 @@ spring:
 
 #### 编码
 
-编写实体类 User
+1. 编写实体类 User
 
  - 类上添加注解 @Entity
  - 主键添加注解 @Id
@@ -105,7 +107,7 @@ public class User {
 }
 ```
 
-编写 Repository 类
+2. 编写 Repository 类
 
 JPA 提供的 JpaRepository 接口已经实现了对单表的增删查改操作以及一些其它常用的方法。
 
@@ -115,7 +117,7 @@ JPA 提供的 JpaRepository 接口已经实现了对单表的增删查改操作�
 public interface UserRepository extends JpaRepository<User, Long> {}
 ```
 
-编写 Controller 接口
+3. 编写 Controller 接口
 
 创建 controller 类，实现增删查改交换接口
 

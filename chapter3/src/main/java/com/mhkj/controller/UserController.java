@@ -4,6 +4,7 @@ import com.mhkj.entity.User;
 import com.mhkj.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +18,7 @@ public class UserController {
     private UserRepository userRepository;
 
     @PostMapping("/add")
-    public List<User> add(User user) {
+    public List<User> add(@RequestBody User user) {
         userRepository.save(user);
         return userRepository.findAll();
     }

@@ -1,94 +1,110 @@
-第三章：SpringBoot项目中配置拦截器
+第三章：SpringBoot项目使用测试用例
 ---
-
-关于拦截器的相关知识可参考：<https://jinnianshilongnian.iteye.com/blog/1670856>
 
 ### 课程目标
 
-学会在 SpringBoot 的项目中怎么配置拦截器
+基于上一章，使用测试用例实现对增删查改接口的测试
 
 ### 操作步骤
 
-#### 实现拦截器
+#### 添加依赖
+
+引入 `spring-boot-starter-test` 的依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+添加依赖后的整体 dependencies 如下所示
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+#### 编码
+
+> 测试用例编写在 src/test/java 源目录下
+
+1. 编写测试用例
 
 ```java
-@Slf4j
-public class TraceInterceptor implements HandlerInterceptor {
+@RunWith(SpringRunner.class)
+@WebAppConfiguration
+@SpringBootTest(classes = Application.class)
+public class UserTest {
 
-    /**
-     * 预处理回调函数
-     * 进入Controller之前执行
-     * 如果返回 true，则进入下一个拦截器，所有拦截器全部通过，则进入 Controller 相应的方法
-     * 如果返回 false，则请求被拦截。
-     */
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String uri = request.getRequestURI();
-        log.info("<-----------------------------------");
-        log.info("request uri: {}", uri);
-        log.info("----------------------------------->");
-        return true;
+    private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Before
+    public void setUp() {
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
-    /**
-     * 后处理回调方法
-     * 经过Controller处理之后执行
-     * 在此处可以对模型数据进行处理或对视图进行处理
-     */
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        System.out.println("entry postHandler");
+    @Test
+    public void testInsert() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+                MockMvcRequestBuilders
+                .post("/user/add")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"name\":\"user1\",\"sex\":1,\"birthday\":\"2000-05-21\"}")
+        )
+//        .andExpect(status().isOk());
+//        .andExpect(content().string("hello"))
+        .andDo(MockMvcResultHandlers.print())
+        .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
     }
 
-    /**
-     * 整个请求处理完毕回调方法，即在视图渲染完毕时回调
-     * 在此处可以进行一些资源清理
-     */
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        System.out.println("entry afterCompletion");
-    }
 }
 ```
 
-#### 注册拦截器
+ - 注解分析
 
-实现 WebMvcConfigurer 接口对 SpringMvc 进行个性化配置。
-
-```java
-@Configuration
-public class WebConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(traceInterceptor());
-    }
-
-    @Bean
-    public TraceInterceptor traceInterceptor() {
-        return new TraceInterceptor();
-    }
-
-}
 ```
+@RunWith(SpringRunner.class) // 指定 SpringRunner 作为单元测试的执行类，SpringRunner 是 spring-test 提供的测试执行单元类
+@WebAppConfiguration         // 模拟 ServletContext
+@SpringBootTest(classes = Application.class) // 指定测试启动类，配置文件以及环境
+```
+
+ - MockMvc 用于向 controller 接口发起模拟请求
+ - @Before 会在测试用例执行之前执行，在本例中用于初始化环境
+ - @Test 标记当前方法是需要执行的测试用例
 
 ### 验证结果
 
-编写一个接口
-
-```java
-@RestController
-public class HelloController {
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello world";
-    }
-
-}
-```
-
-启动服务，本地访问 `/hello` 接口，查看日志输出
+选择测试用例，右键选择 Run
 
 ### 源码地址
 
@@ -96,4 +112,8 @@ public class HelloController {
 
 ### 总结
 
-使用 SpringMVC 时是使用 XML 进行注册，SpringBoot 则推荐使用代码进行注册，最终结果其实是一样的，所以只需要知道操作步骤即可。
+请为自己的所有方法编写测试用例
+
+### 参考
+
+ - <https://blog.csdn.net/u010002184/article/details/81174153>

@@ -324,6 +324,12 @@ public class Application {
 
 因为使用测试用例时不会主动加载 Filter，所以需要在启动测试用例环境时进行注册
 
+```
+MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(new TraceFilter()).build();
+```
+
+测试用例代码如下：
+
 ```java
 @RunWith(SpringRunner.class)
 @WebAppConfiguration

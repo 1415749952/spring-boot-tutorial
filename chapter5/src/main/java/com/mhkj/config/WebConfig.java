@@ -1,22 +1,20 @@
 package com.mhkj.config;
 
-import com.mhkj.interceptor.TraceInterceptor;
+import com.mhkj.filter.TraceFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(traceInterceptor());
-    }
+public class WebConfig {
 
     @Bean
-    public TraceInterceptor traceInterceptor() {
-        return new TraceInterceptor();
+    public FilterRegistrationBean webTraceFilterRegistration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new TraceFilter());
+        registration.addUrlPatterns("/*");
+        registration.setOrder(1);
+        return registration;
     }
 
 }

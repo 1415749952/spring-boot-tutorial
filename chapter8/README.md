@@ -1,4 +1,4 @@
-第八章：SpringBoot整合hibernate-validator参数校验
+第八章：SpringBoot整合hibernate-validator进行参数校验
 ---
 
 `spring-boot-starter-web` 项目中默认已经集成了 `hibernate-validator`
@@ -24,11 +24,59 @@
 
 ### 课程目标
 
-学习在 SpringBoot 项目中如何使用 hibernate-validator 进行入参校验
+本章将在[SpringBoot集成SpringBootJPA完成CURD]()的基础上，整合 hibernate-validator，对入参进行校验。
 
 ### 操作步骤
 
-#### 添加校验规则
+#### 添加依赖
+
+`spring-boot-starter-web` 已经默认添加对 `hibernate-validator` 的依赖
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-undertow</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+#### 编码
+
+1. 为实体类添加校验规则
 
 ```java
 @Getter
@@ -61,27 +109,36 @@ public class UserBO {
 }
 ```
 
-#### 在接口处使用校验
+2. 使用校验
 
-在参数前面添加 @Valid 注解，如果需要获取校验结果，则可以在最后一个参数使用 BindingResult 对象获取校验结果，否则，框架会抛出相应的异常，可以通过框架的异常处理机制进行统一处理。
+在 Controller 接口的参数前面添加 @Valid 注解，入参注入时便会自动进行规则校验，如果校验成功，则执行方法体，如果校验失败，有两种处理方法。
+
+ - 在参数列表的最后面添加一个 BindingResult 对象获取校验结果，自行组织输出内容。
+ - 不使用 BindingResult 对象，则框架抛出异常，通过异常处理机制可以进行捕获，组织输出内容。
 
 ```java
 @RestController
+@RequestMapping("/user")
+@Slf4j
 public class UserController {
 
+    @Autowired
+    private UserRepository userRepository;
+
     /**
-     * 如果校验失败，抛出异常
+     * 不使用 BindingResult 接收校验结果，Spring 将抛出异常
      */
-    @RequestMapping("/register")
-    public String doRegister(@RequestBody @Valid UserBO bo) {
-        return "success";
+    @PostMapping("/add1")
+    public List<User> add1(@Valid @RequestBody User user) {
+        userRepository.save(user);
+        return userRepository.findAll();
     }
 
     /**
-     * 如果校验失败，希望自行对结果进行处理，则使用 BindingResult 对象接收校验结果
+     * 使用 BindingResult 接收校验结果，自行组织输出内容
      */
-    @RequestMapping("/register1")
-    public String doRegister1(@RequestBody @Valid UserBO bo, BindingResult result) {
+    @PostMapping("/add2")
+    public List<User> add2(@Valid @RequestBody User user, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder sb = new StringBuilder();
             List<FieldError> fieldErrors = result.getFieldErrors();
@@ -89,9 +146,11 @@ public class UserController {
                 sb.append(fieldError.getDefaultMessage());
                 sb.append(",");
             }
-            return sb.toString();
+            log.debug(sb.toString());
+            return null;
         }
-        return "success";
+        userRepository.save(user);
+        return userRepository.findAll();
     }
 
 }
@@ -99,7 +158,58 @@ public class UserController {
 
 ### 验证结果
 
-启动服务，使用 postman 分别访问 `/register` 及 `/register1`，查看返回结果。
+编写测试用例
+
+```java
+@RunWith(SpringRunner.class)
+@WebAppConfiguration
+@SpringBootTest(classes = Application.class)
+public class UserTest {
+
+    private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Before
+    public void setUp() {
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void test1() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+                MockMvcRequestBuilders
+                .post("/user/add1")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"name\":\"user1\",\"sex\":1,\"birthday\":\"2030-05-21\"}")
+        )
+//        .andExpect(status().isOk());
+//        .andExpect(content().string("hello"))
+        .andDo(MockMvcResultHandlers.print())
+        .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
+    }
+
+    @Test
+    public void test2() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+                MockMvcRequestBuilders
+                        .post("/user/add2")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content("{\"name\":\"user1\",\"sex\":1,\"birthday\":\"2030-05-21\"}")
+        )
+//        .andExpect(status().isOk());
+//        .andExpect(content().string("hello"))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
+    }
+
+}
+```
 
 ### 源码地址
 

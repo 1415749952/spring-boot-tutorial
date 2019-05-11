@@ -1,8 +1,12 @@
 package com.mhkj.controller;
 
-import com.mhkj.BO.UserBO;
+import com.mhkj.entity.User;
+import com.mhkj.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,21 +15,27 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequestMapping("/user")
+@Slf4j
 public class UserController {
 
+    @Autowired
+    private UserRepository userRepository;
+
     /**
-     * 如果校验失败，抛出异常
+     * 不使用 BindingResult 接收校验结果，Spring 将抛出异常
      */
-    @RequestMapping("/register")
-    public String doRegister(@RequestBody @Valid UserBO bo) {
-        return "success";
+    @PostMapping("/add1")
+    public List<User> add1(@Valid @RequestBody User user) {
+        userRepository.save(user);
+        return userRepository.findAll();
     }
 
     /**
-     * 如果校验失败，希望自行对结果进行处理，则使用 BindingResult 对象接收校验结果
+     * 使用 BindingResult 接收校验结果，自行组织输出内容
      */
-    @RequestMapping("/register1")
-    public String doRegister1(@RequestBody @Valid UserBO bo, BindingResult result) {
+    @PostMapping("/add2")
+    public List<User> add2(@Valid @RequestBody User user, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder sb = new StringBuilder();
             List<FieldError> fieldErrors = result.getFieldErrors();
@@ -33,9 +43,11 @@ public class UserController {
                 sb.append(fieldError.getDefaultMessage());
                 sb.append(",");
             }
-            return sb.toString();
+            log.debug(sb.toString());
+            return null;
         }
-        return "success";
+        userRepository.save(user);
+        return userRepository.findAll();
     }
 
 }

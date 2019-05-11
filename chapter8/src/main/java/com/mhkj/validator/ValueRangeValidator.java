@@ -26,8 +26,9 @@ public class ValueRangeValidator implements ConstraintValidator<ValueRange, Obje
         if (value == null) {
             return true;
         }
+        String v = value.toString();
         for (String s : values) {
-            if (Objects.equals(s, value)) {
+            if (Objects.equals(s, v)) {
                 return true;
             }
         }

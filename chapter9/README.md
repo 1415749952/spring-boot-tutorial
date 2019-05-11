@@ -11,9 +11,55 @@
 
 ### 操作步骤
 
-#### 构造全局统一出参
+#### 添加依赖
 
-所有接口返回的结构一致
+添加 `spring-boot-starter-web` 的依赖
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-undertow</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+### 编码
+
+1. 构建统一输出类，作为项目所有接口的输出对象
 
 ```java
 @Getter
@@ -41,32 +87,18 @@ public class RestData<T> {
         this.info = info;
     }
 
-    /**
-     * 操作是否成功
-     *
-     * @return true | false
-     */
     public boolean isSuccess() {
         return this.status;
     }
 
-    /**
-     * 操作成功，组装返回数据
-     */
     public RestData<T> success() {
         return this.success(null);
     }
 
-    /**
-     * 操作成功，组装返回数据
-     */
     public RestData<T> success(String info) {
         return success(info, null);
     }
 
-    /**
-     * 操作成功，组装返回数据
-     */
     public RestData<T> success(String info, T data) {
         if (info != null && !info.isEmpty()) {
             this.status = true;
@@ -78,23 +110,14 @@ public class RestData<T> {
         }
     }
 
-    /**
-     * 操作成功，组装返回数据
-     */
     public RestData<T> error() {
         return this.error(null);
     }
 
-    /**
-     * 操作成功，组装返回数据
-     */
     public RestData<T> error(String info) {
         return error(info, null);
     }
 
-    /**
-     * 操作成功，组装返回数据
-     */
     public RestData<T> error(String info, T data) {
         if (info != null && !info.isEmpty()) {
             this.status = false;
@@ -109,9 +132,11 @@ public class RestData<T> {
 }
 ```
 
-#### 构建全局异常处理器
+2. 编写异常处理器
 
-由于不同的参数接收器，在进行参数校验及数据转换时会抛出不同的异常，在这里只对 JSON 格式的传参模式进行了处理。
+ - 类上添加 `@RestControllerAdvice` 注解，是 `@ResponseBody` 与 `@ControllerAdvice` 的结合，其中 `@ControllerAdvice` 用于注册异常处理器，而 `@ResponseBody` 用于标记该类中所有方法返回类型为 JSON。
+ - 方法上添加 `@ExceptionHandler` 注解，用于标记该方法用于处理何种异常。
+ - 该类中可以同时编写多个方法，用于处理多种异常，Spring 会自行根据异常类型选择执行相应的方法。
 
 ```java
 @Slf4j
@@ -154,7 +179,7 @@ public class RestExceptionHandler {
 }
 ```
 
-#### 编写接口
+3. 编写接口
 
 ```java
 @RestController
@@ -168,9 +193,61 @@ public class UserController {
 }
 ```
 
+4. 编写项目启动类
+
+```java
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
 ### 验证结果
 
-启动服务，使用 postman 访问 `/register`，查看返回结果。
+编写测试用例
+
+```java
+@RunWith(SpringRunner.class)
+@WebAppConfiguration
+@SpringBootTest(classes = Application.class)
+public class UserTest {
+
+    private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Before
+    public void setUp() {
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void test1() throws Exception {
+        MvcResult mvcResult = mvc.perform(
+                MockMvcRequestBuilders
+                .post("/user/add")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"name\":\"user1\",\"sex\":1,\"birthday\":\"2030-05-21\"}")
+        )
+        .andDo(MockMvcResultHandlers.print())
+        .andReturn();
+
+        Assert.assertEquals(200, mvcResult.getResponse().getStatus());
+    }
+
+}
+```
+
+调用测试用例可以看到输出
+
+```
+{"status":false,"info":"用户等级不能为空","data":null,"success":false}
+```
 
 ### 源码地址
 

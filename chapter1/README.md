@@ -1,7 +1,7 @@
 第一章：SpringBoot快速构建Web应用
 ---
 
-### 课程目标
+### 本章目标
 
 使用 SpringBoot 完成一个简单的 Web 应用程序开发，初步体验 SpringBoot 快速、简洁的特性。
 

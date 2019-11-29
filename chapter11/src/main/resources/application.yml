@@ -4,3 +4,11 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: app
     password: 123456
+
+  jpa:
+    database: mysql
+    # 显示后台处理的SQL语句
+    show-sql: true
+    # 自动检查实体和数据库表是否一致，如果不一致则会进行更新数据库表
+    hibernate:
+      ddl-auto: none

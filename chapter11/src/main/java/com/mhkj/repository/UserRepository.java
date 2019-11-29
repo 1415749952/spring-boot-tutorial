@@ -1,9 +1,7 @@
 package com.mhkj.repository;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mhkj.entity.User;
-import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Mapper
-public interface UserRepository extends BaseMapper<User> {
+public interface UserRepository extends JpaRepository<User, Long> {
 }

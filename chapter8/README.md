@@ -5,22 +5,43 @@
 
 ### 相关知识
 
-```
-@AssertTrue     // 用于 boolean 字段，该字段只能为 true
-@AssertFalse    // 用于 boolean 字段，该字段只能为 false
-@DecimalMax     // 用于 Number 字段，只能小于或等于该值
-@DecimalMin     // 用于 Number 字段，只能大于或等于该值
-@Digits(integer=2,fraction=20) // 检查是否是数字，校验整数位及小数位
-@Future         // 检查该字段的日期是否是属于将来的日期
-@Length(min=2,max=6)           // 用于字符串，检查字段长度是否在指定范围内
-@Max            // 用于 Number 字段，只能小于或等于该值
-@Min            // 用于 Number 字段，只能大于或等于该值
-@NotNull        // 该字段不能为空
-@NotEmpty       // 用于字符串，该字段不能为空字符串
-@NotBlank       // 用于字符串，该字段不能为空字符串，忽略空格
-@Null           // 该字段必须为空
-@Size(min=2,max=4)  // 用于字符串、数组、集合、Map等，检查该字段的size是否在指定范围
-```
+#### 常用注解
+
+> JSR 303 Bean Validation
+
+注解|说明|数据类型
+---|---|---
+AssertTrue|标注元素必须为true|Boolean
+AssertFalse|标注元素必须为false|Boolean
+DecimalMax(value,isclusive)|标注元素必须小于等于指定值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+DecimalMin(value,isclusive)|标注元素必须大于等于指定值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+Digits(integer,fraction)|标注元素必须位于指定位数之内|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+Email(regexp,flags)|标注元素必须为格式正确的邮件地址|CharSequence
+Future|标注元素必须为将来的日期|Date,Calendar,Instant, LocalDate,LocalDateTime, LocalTime,MonthDay, OffsetDateTime,OffsetTime, Year,YearMonth, ZonedDateTime,HijrahDate, JapaneseDate,MinguoDate, ThaiBuddhistDate
+FutureOrPresent|标注元素必须为现在或将来的日期|同Future
+Max(value)|标注元素必须小于等于指定值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+Min(value)|标注元素必须大于等于指定值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+Negative|标注元素必须为严格负值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+NegativeOrZero|标注元素必须为严格的负值或者0值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+NotBlank|标注元素必须不为null，且必须包含至少一个非空字符|CharSequence
+NotEmpty|标注元素必须不为null，且必须包含至少一个子元素|CharSequence,Collection,Map,Array
+NotNull|标注元素必须不为null|all
+Null|标注元素必须为null|all
+Past|标注元素必须为过去的日期|同Future
+PastOrPresent|标注元素必须为过去的或者现在的日期|同Future
+Pattern(regexp,flags)|标注元素必须匹配给定的正则表达式|CharSequence
+Positive|标注元素必须为严格的正值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+PositiveOrZero|标注元素必须为严格的正值或者0值|BigDecimal,BigInteger, CharSequence,byte,short, int, long,Byte,Short, Integer,Long
+Size(min,max)|标注元素必须在指定范围之内|CharSequence,Collection,Map,Array
+
+> Hibernate Validation
+
+注解|说明|备注
+---|---|---
+Length(min,max)|标注元素的长度必须在指定范围之内，包含最大值|字符串
+Range(min,max)|标注元素值必须在指定范围之内|数字值，或者其字符串形式
+URL(regexp,flags)|标注元素必须为格式正确的URL|字符串
+URL(protocol,host,port)|标注元素必须满足给定的协议主机和端口号|字符串
 
 ### 课程目标
 
@@ -223,7 +244,9 @@ public class UserTest {
 
  - <http://www.cnblogs.com/mr-yang-localhost/p/7812038.html>
  - <https://blog.csdn.net/qq_22845447/article/details/84034289>
-
+ - <https://cloud.tencent.com/developer/article/1054194>
+ - <https://www.cnblogs.com/V1haoge/p/9953744.html>
+ 
 ### 扩展
 
 #### 自定义校验

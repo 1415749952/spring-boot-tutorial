@@ -227,7 +227,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 }
 ```
 
-3. 编写 Controller 接口
+4. 编写 Controller 接口
 
 创建 controller 类，实现增删查改交换接口
 
@@ -266,6 +266,26 @@ public class UserController {
     public List<User> update(User user) {
         userService.updateById(user);
         return userService.list();
+    }
+
+}
+```
+
+5. 实现分页查询
+
+创建自动加载类 MybatisConfiguartion，并注册 PaginationInterceptor 类，即可自动加载分页查询
+
+```java
+@Configuration
+public class MybatisConfiguartion {
+
+    /**
+     * 配置分页插件
+     */
+    @Bean
+    @ConditionalOnClass(BaseMapper.class)
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
     }
 
 }

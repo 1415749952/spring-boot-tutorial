@@ -1,4 +1,4 @@
-第十章：SpringBoot整合MapStruct简化参数映射
+第十章：SpringBoot整合MapStruct简化属性复制
 ---
 
 在之前章节的例子中，我们在接收参数的时候都是使用的 User 类对象，这是一个 DO 对象，

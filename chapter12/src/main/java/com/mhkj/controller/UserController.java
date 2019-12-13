@@ -1,5 +1,8 @@
 package com.mhkj.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mhkj.bo.PageBO;
 import com.mhkj.bo.UserBO;
 import com.mhkj.entity.User;
 import com.mhkj.mapping.UserMapper;
@@ -50,6 +53,12 @@ public class UserController {
     public List<User> update(User user) {
         userService.updateById(user);
         return userService.list();
+    }
+
+    @ApiOperation(value = "分页查询所有用户信息", notes = "分页查询所有用户信息")
+    @PostMapping("/search")
+    public IPage<User> search(PageBO bo) {
+        return userService.page(new Page<>(bo.getPageNum(), bo.getPageSize()));
     }
 
 }

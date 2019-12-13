@@ -271,29 +271,9 @@ public class UserController {
 }
 ```
 
-5. 实现分页查询
-
-创建自动加载类 MybatisConfiguartion，并注册 PaginationInterceptor 类，即可自动加载分页查询
-
-```java
-@Configuration
-public class MybatisConfiguartion {
-
-    /**
-     * 配置分页插件
-     */
-    @Bean
-    @ConditionalOnClass(BaseMapper.class)
-    public PaginationInterceptor paginationInterceptor() {
-        return new PaginationInterceptor();
-    }
-
-}
-```
-
 ### 验证结果
 
-编写测试用例
+编写测试用例(只写的新增的用例，其它的请自行补充)
 ```java
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -335,4 +315,52 @@ public class UserTest {
 
 ### 总结
 
-Swagger 可以实时生成文档，保证文档的时效性，这有助于前后端联合开发、微服务联合开发等
+Mybatis-plus 在 mybatis 的基础上实现通用 Mapper 以及通用 Service，极大地简化了开发过程，让开发人员从 SQL 组装中脱离出来，专心处理业务逻辑
+
+### 扩展
+
+#### 实现分页查询
+
+创建自动加载类 MybatisConfiguartion，并注册 PaginationInterceptor 类，即可自动加载分页查询
+
+```java
+@Configuration
+public class MybatisConfiguartion {
+
+    /**
+     * 配置分页插件
+     */
+    @Bean
+    @ConditionalOnClass(BaseMapper.class)
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
+
+}
+```
+
+创建 PageBO 用于接收分页入参
+```java
+@Data
+public class PageBO {
+
+    /**
+     * 当前页数
+     */
+    private int pageNum = 1;
+    /**
+     * 每页显示记录数
+     */
+    private int pageSize = 20;
+
+}
+```
+
+在 Controller 中添加分页查询方法
+```java
+@ApiOperation(value = "分页查询所有用户信息", notes = "分页查询所有用户信息")
+@PostMapping("/search")
+public IPage<User> search(PageBO bo) {
+    return userService.page(new Page<>(bo.getPageNum(), bo.getPageSize()));
+}
+```

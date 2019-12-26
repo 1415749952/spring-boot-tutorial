@@ -9,9 +9,9 @@ SpringBoot学习教程
  - [第七章：SpringBoot整合Lombok让项目更简洁](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter7)
  - [第八章：SpringBoot整合hibernate-validator参数校验](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter8)
  - [第九章：SpringBoot全局异常处理](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter9)
- - [第十章：SpringBoot整合MapStruct简化参数映射](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter10)
- - [第十一章：SpringBoot整合Mybatis-plus实现通用Mapper](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter11)
- - [第十二章：SpringBoot整合Mybatis-plus代码生成](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter12)
+ - [第十章：SpringBoot整合MapStruct优雅属性映射](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter10)
+ - [第十一章：SpringBoot整合Swagger2自动生成API文档](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter11)
+ - [第十二章：SpringBoot整合Mybatis-plus](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter12)
  - [第十三章：SpringBoot使用数据缓存](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter13)
  
  

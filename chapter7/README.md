@@ -210,8 +210,56 @@ File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选�
 
 改写实体类
 
-将 User 类的 get / set 方法全部删除，在类上添加注解 @Data，修改后的 User 类代码如下，可以看到整个类的代码变得非常清爽。
+将 User 类的 get / set 方法全部删除，在类上添加注解 @Data。
 
+修改前：
+```java
+@Entity
+public class User {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private Integer sex;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+}
+```
+
+修改后的代码如下，可以看到整个类的代码变得非常清爽
 ```java
 @Data
 @Entity
@@ -224,6 +272,53 @@ public class User {
     private Integer sex;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
+
+}
+```
+
+UserRepository 保持不变
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+}
+```
+
+改写 Controller 类
+ - 添加 @Slf4j 注解，使用 `log.debug` 进行日志打印
+ - 添加 @AllArgsConstructor 注解，同时去除 UserRepository 属性上的 @Autowired 注解，使用 Spring 推荐的构造方法注入
+```java
+@Slf4j
+@AllArgsConstructor
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    private UserRepository userRepository;
+
+    @PostMapping("/add")
+    public List<User> add(@RequestBody User user) {
+        log.debug("用户新增");
+        userRepository.save(user);
+        return userRepository.findAll();
+    }
+
+    @PostMapping("/delete")
+    public List<User> delete(Long id) {
+        log.debug("用户删除");
+        userRepository.deleteById(id);
+        return userRepository.findAll();
+    }
+
+    @PostMapping("/list")
+    public List<User> list() {
+        return userRepository.findAll();
+    }
+
+    @PostMapping("/update")
+    public List<User> update(User user) {
+        log.debug("用户修改");
+        userRepository.save(user);
+        return userRepository.findAll();
+    }
 
 }
 ```

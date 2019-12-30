@@ -72,16 +72,6 @@ URL(protocol,host,port)|标注元素必须满足给定的协议主机和端口�
     </dependency>
 
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-
-    <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <scope>provided</scope>
@@ -143,23 +133,19 @@ public class UserBO {
 @Slf4j
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
-
     /**
      * 不使用 BindingResult 接收校验结果，Spring 将抛出异常
      */
     @PostMapping("/add1")
-    public List<User> add1(@Valid @RequestBody User user) {
-        userRepository.save(user);
-        return userRepository.findAll();
+    public User add1(@Valid @RequestBody User user) {
+        return user;
     }
 
     /**
      * 使用 BindingResult 接收校验结果，自行组织输出内容
      */
     @PostMapping("/add2")
-    public List<User> add2(@Valid @RequestBody User user, BindingResult result) {
+    public User add2(@Valid @RequestBody User user, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder sb = new StringBuilder();
             List<FieldError> fieldErrors = result.getFieldErrors();
@@ -170,8 +156,7 @@ public class UserController {
             log.debug(sb.toString());
             return null;
         }
-        userRepository.save(user);
-        return userRepository.findAll();
+        return user;
     }
 
 }

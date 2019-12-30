@@ -1,4 +1,4 @@
-第十章：SpringBoot整合MapStruct简化属性复制
+第十章：SpringBoot整合MapStruct优雅复制属性
 ---
 
 在之前章节的例子中，我们在接收参数的时候都是使用的 User 类对象，这是一个 DO 对象，
@@ -34,7 +34,6 @@ File -> Settings 打开设置界面，
 #### 添加依赖
 
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -44,7 +43,6 @@ File -> Settings 打开设置界面，
 ```
 
 添加 `mapstruct` 的依赖
-
 ```xml
 <dependency>
     <groupId>org.mapstruct</groupId>
@@ -61,7 +59,6 @@ File -> Settings 打开设置界面，
 ```
 
 添加 `mapstruct` 及 `lombok` 的插件依赖
-
 ```xml
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
@@ -81,7 +78,6 @@ File -> Settings 打开设置界面，
         </annotationProcessorPaths>
     </configuration>
 </plugin>
-
 ```
 
 添加后的整体依赖如下
@@ -105,16 +101,6 @@ File -> Settings 打开设置界面，
    </dependency>
 
    <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-data-jpa</artifactId>
-   </dependency>
-
-   <dependency>
-       <groupId>mysql</groupId>
-       <artifactId>mysql-connector-java</artifactId>
-   </dependency>
-
-   <dependency>
        <groupId>org.projectlombok</groupId>
        <artifactId>lombok</artifactId>
        <scope>provided</scope>
@@ -133,13 +119,34 @@ File -> Settings 打开设置界面，
        <scope>provided</scope>
    </dependency>
 
-
    <dependency>
        <groupId>org.springframework.boot</groupId>
        <artifactId>spring-boot-starter-test</artifactId>
        <scope>test</scope>
    </dependency>
 </dependencies>
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.mapstruct</groupId>
+                        <artifactId>mapstruct-processor</artifactId>
+                        <version>1.3.0.Final</version>
+                    </path>
+                    <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>${lombok.version}</version>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>    
+    </plugins>
+</build>
 ```
 
 ### 编码
@@ -151,17 +158,7 @@ File -> Settings 打开设置界面，
 @Setter
 public class UserBO {
 
-    /**
-     * 手机号
-     */
-    @NotBlank(message = "手机号不能为空")
     private String mobile;
-
-    /**
-     * 密码
-     */
-    @NotBlank(message = "密码不能为空")
-    @Length(min = 6, max = 16, message = "密码长度必须在6-16位之间")
     private String upwd;
 
 }
@@ -189,16 +186,15 @@ public interface UserMapper {
 
 ```java
 @RestController
-@RequestMapping("/user")
 @Slf4j
 @AllArgsConstructor
 public class UserController {
 
-    private UserRepository userRepository;
-
     @PostMapping("/register")
-    public User register(@Valid @RequestBody UserBO userBO) {
-        return userRepository.save(UserMapper.INSTANCE.bo2Do(userBO));
+    public User register(@RequestBody UserBO userBo) {
+        User user = UserMapper.INSTANCE.bo2Do(userBo);
+        // ... 执行数据库操作
+        return user;
     }
 
 }

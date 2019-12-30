@@ -72,16 +72,6 @@ Swagger官网：<https://swagger.io>
     </dependency>
 
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-
-    <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <scope>provided</scope>
@@ -91,19 +81,6 @@ Swagger官网：<https://swagger.io>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
         <scope>test</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-jdk8</artifactId>
-        <version>1.3.0.Final</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-processor</artifactId>
-        <version>1.3.0.Final</version>
-        <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -118,29 +95,6 @@ Swagger官网：<https://swagger.io>
         <version>2.9.2</version>
     </dependency>
 </dependencies>
-
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <annotationProcessorPaths>
-                    <path>
-                        <groupId>org.mapstruct</groupId>
-                        <artifactId>mapstruct-processor</artifactId>
-                        <version>1.3.0.Final</version>
-                    </path>
-                    <path>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                        <version>${lombok.version}</version>
-                    </path>
-                </annotationProcessorPaths>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
 ```
 
 ### 编码
@@ -194,16 +148,13 @@ public class SwaggerAutoConfiguration {
 ```java
 @RestController
 @Slf4j
-@AllArgsConstructor
 @Api("用户管理")
 public class UserController {
 
-    private UserRepository userRepository;
-
     @ApiOperation(value = "用户注册", notes = "用户注册")
     @PostMapping("/register")
-    public User register(@Valid @RequestBody UserBO userBO) {
-        return userRepository.save(UserMapper.INSTANCE.bo2Do(userBO));
+    public UserBO register(@RequestBody @ApiParam(name = "注册对象", value = "JSON对象", required = true) UserBO userBO) {
+        return userBO;
     }
 
 }
@@ -217,19 +168,10 @@ public class UserController {
 @ApiModel("用户注册对象")
 public class UserBO {
 
-    /**
-     * 手机号，长度在6-16个字符之间，必须参数
-     */
     @ApiModelProperty(value = "手机号", required = true)
-    @NotBlank(message = "手机号不能为空")
     private String mobile;
 
-    /**
-     * 密码
-     */
     @ApiModelProperty(value = "密码", required = true)
-    @NotBlank(message = "密码不能为空")
-    @Length(min = 6, max = 16, message = "密码长度必须在6-16位之间")
     private String upwd;
 
 }

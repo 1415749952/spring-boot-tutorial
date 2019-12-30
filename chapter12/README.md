@@ -23,7 +23,7 @@ Swagger官网：<https://mp.baomidou.com/>
 
 ### 课程目标
 
-在 [第十一章：SpringBoot整合Swagger2](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter11) 的代码基础上，
+在 [第二章：SpringBoot集成SpringBootJPA完成CURD](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter2) 的代码基础上，
 替换 spring-data-jpa 为 mybatis-plus，熟悉在 mybatis-plus 下实现单表数据的CURD编码
 
 ### 操作步骤
@@ -88,70 +88,11 @@ Swagger官网：<https://mp.baomidou.com/>
     </dependency>
 
     <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-jdk8</artifactId>
-        <version>1.3.0.Final</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-processor</artifactId>
-        <version>1.3.0.Final</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger2</artifactId>
-        <version>2.9.2</version>
-    </dependency>
-
-    <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger-ui</artifactId>
-        <version>2.9.2</version>
-    </dependency>
-
-    <dependency>
         <groupId>com.baomidou</groupId>
         <artifactId>mybatis-plus-boot-starter</artifactId>
         <version>3.2.0</version>
     </dependency>
 </dependencies>
-
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <annotationProcessorPaths>
-                    <path>
-                        <groupId>org.mapstruct</groupId>
-                        <artifactId>mapstruct-processor</artifactId>
-                        <version>1.3.0.Final</version>
-                    </path>
-                    <path>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                        <version>${lombok.version}</version>
-                    </path>
-                </annotationProcessorPaths>
-                <compilerArgs>
-                    <compilerArg>
-                        -Amapstruct.suppressGeneratorTimestamp=true
-                    </compilerArg>
-                    <compilerArg>
-                        -Amapstruct.suppressGeneratorVersionInfoComment=true
-                    </compilerArg>
-                    <compilerArg>
-                        -Amapstruct.unmappedTargetPolicy=IGNORE
-                    </compilerArg>
-                </compilerArgs>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
 ```
 
 #### 配置
@@ -235,33 +176,27 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 @RestController
 @Slf4j
 @AllArgsConstructor
-@Api("用户管理")
 public class UserController {
 
     private UserService userService;
 
-    @ApiOperation(value = "用户注册", notes = "用户注册")
     @PostMapping("/register")
-    public User register(@Valid @RequestBody @ApiParam(name = "注册对象", value = "JSON对象", required = true) UserBO userBO) {
-        User user = UserMapper.INSTANCE.bo2Do(userBO);
+    public User register(@RequestBody User user) {
         userService.save(user);
         return user;
     }
 
-    @ApiOperation(value = "用户删除", notes = "用户删除")
     @PostMapping("/delete")
     public List<User> delete(Long id) {
         userService.removeById(id);
         return userService.list();
     }
 
-    @ApiOperation(value = "查询所有用户信息", notes = "查询所有用户信息")
     @PostMapping("/list")
     public List<User> list() {
         return userService.list();
     }
 
-    @ApiOperation(value = "修改用户信息", notes = "修改用户信息")
     @PostMapping("/update")
     public List<User> update(User user) {
         userService.updateById(user);
@@ -358,7 +293,6 @@ public class PageBO {
 
 在 Controller 中添加分页查询方法
 ```java
-@ApiOperation(value = "分页查询所有用户信息", notes = "分页查询所有用户信息")
 @PostMapping("/search")
 public IPage<User> search(PageBO bo) {
     return userService.page(new Page<>(bo.getPageNum(), bo.getPageSize()));

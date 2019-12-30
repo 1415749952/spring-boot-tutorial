@@ -19,7 +19,6 @@ Swagger官网：<https://swagger.io>
 
 ### 课程目标
 
-在 [第十章：SpringBoot整合MapStruct简化参数映射](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter10) 的代码基础上，
 整合 Swagger2 实现自动生成文档
 
 ### 操作步骤

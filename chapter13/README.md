@@ -19,7 +19,6 @@ github地址：<https://github.com/neoremind/fluent-validator>
 
 ### 课程目标
 
-在 [第十二章：SpringBoot整合Mybatis-plus](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter12) 的代码基础上，
 替换 hibernate-validator 为 fluent-validator，实现对入参的校验及异常输出
 
 ### 操作步骤
@@ -98,11 +97,6 @@ fluent-validator 集成 spring 需要添加依赖
     </dependency>
 
     <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-
-    <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <scope>provided</scope>
@@ -112,37 +106,6 @@ fluent-validator 集成 spring 需要添加依赖
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
         <scope>test</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-jdk8</artifactId>
-        <version>1.3.0.Final</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct-processor</artifactId>
-        <version>1.3.0.Final</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger2</artifactId>
-        <version>2.9.2</version>
-    </dependency>
-
-    <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger-ui</artifactId>
-        <version>2.9.2</version>
-    </dependency>
-
-    <dependency>
-        <groupId>com.baomidou</groupId>
-        <artifactId>mybatis-plus-boot-starter</artifactId>
-        <version>3.2.0</version>
     </dependency>
 
     <dependency>
@@ -169,40 +132,6 @@ fluent-validator 集成 spring 需要添加依赖
         <version>1.0.9</version>
     </dependency>
 </dependencies>
-
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <annotationProcessorPaths>
-                    <path>
-                        <groupId>org.mapstruct</groupId>
-                        <artifactId>mapstruct-processor</artifactId>
-                        <version>1.3.0.Final</version>
-                    </path>
-                    <path>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                        <version>${lombok.version}</version>
-                    </path>
-                </annotationProcessorPaths>
-                <compilerArgs>
-                    <compilerArg>
-                        -Amapstruct.suppressGeneratorTimestamp=true
-                    </compilerArg>
-                    <compilerArg>
-                        -Amapstruct.suppressGeneratorVersionInfoComment=true
-                    </compilerArg>
-                    <compilerArg>
-                        -Amapstruct.unmappedTargetPolicy=IGNORE
-                    </compilerArg>
-                </compilerArgs>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
 ```
 
 #### 注册
@@ -310,15 +239,9 @@ public class RestExceptionHandler {
 @Setter
 public class UserBO {
 
-    /**
-     * 手机号，长度在6-16个字符之间，必须参数
-     */
     @NotBlank(message = "手机号不能为空")
     private String mobile;
 
-    /**
-     * 密码
-     */
     @NotBlank(message = "密码不能为空")
     @Length(min = 6, max = 16, message = "密码长度必须在6-16位之间")
     private String upwd;
@@ -332,17 +255,14 @@ public class UserBO {
 
 ```java
 @RestController
-@AllArgsConstructor
+@Slf4j
 public class UserController {
 
-    private UserService userService;
-
     @PostMapping("/register")
-    public User register(@FluentValid @RequestBody UserBO userBo) {
-        User user = UserMapper.INSTANCE.bo2Do(userBo);
-        userService.save(user);
-        return user;
+    public RestData<UserBO> register(@FluentValid @RequestBody UserBO userBo) {
+        return new RestData<UserBO>().success("", userBo);
     }
+
 }
 ```
 

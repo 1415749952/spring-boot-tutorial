@@ -12,6 +12,8 @@ SpringBoot学习教程
  - [第十章：SpringBoot整合MapStruct优雅属性映射](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter10)
  - [第十一章：SpringBoot整合Swagger2自动生成API文档](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter11)
  - [第十二章：SpringBoot整合Mybatis-plus](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter12)
- - [第十三章：SpringBoot使用数据缓存](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter13)
+ - [第十三章：SpringBoot整合fluent-validator优雅业务校验](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter13)
+ - [第十四章：SpringBoot定制自已专属的启动Banner](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter14)
+ - [第十五章：SpringBoot使用AOP记录操作日志](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter15)
  
  

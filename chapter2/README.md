@@ -1,18 +1,15 @@
-第二章：SpringBoot集成SpringBootJPA完成CURD
+二、集成SpringBootJPA完成CURD
 ---
 
 在第一章中，我们使用 SpringBoot 创建了一个最简单的 Web 项目，这一章将在第一章的基础上，实现对数据库的操作。
 
-### 课程目标
+### 目标
 
 整合 SpringBootJPA，实现对 mysql 数据库表的增删查改操作。
 
-### 操作步骤
-
+### 准备工作
 #### 初始化数据库
-
 在 mysql 的 test 库中创建表 user，脚本如下，其中主键设置为自动增长。
-
 ```sql
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
@@ -24,10 +21,9 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
 ```
 
+### 操作步骤
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -37,7 +33,6 @@ CREATE TABLE `user` (
 ```
 
 引入 `spring-boot-starter-web`、`spring-boot-starter-data-jpa`、`mysql` 的依赖
-
 ```xml
 <dependencies>
     <dependency>
@@ -64,7 +59,6 @@ CREATE TABLE `user` (
 在 src/main/resources 目录下添加 application.yml 文件。
 
 配置数据源及 JPA 相关配置
-
 ```yaml
 spring:
   datasource:
@@ -112,7 +106,6 @@ public class User {
 JPA 提供的 JpaRepository 接口已经实现了对单表的增删查改操作以及一些其它常用的方法。
 
 创建接口 UserRepository，继承 JpaRepository 接口，内容如下
-
 ```java
 public interface UserRepository extends JpaRepository<User, Long> {}
 ```
@@ -163,6 +156,6 @@ public class UserController {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 JPA 底层使用的是 Hibernate 框架，已经封装了对单表的各种操作，只需要实现 JpaRepository 接口即可以获得对当前表的各种操作方法，这使得使用 JPA 进行数据库的 CURD 操作变得非常简单。

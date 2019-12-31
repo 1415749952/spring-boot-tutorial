@@ -1,7 +1,7 @@
-第一章：SpringBoot快速构建Web应用
+快速构建Web应用
 ---
 
-### 本章目标
+### 目标
 
 使用 SpringBoot 完成一个简单的 Web 应用程序开发，初步体验 SpringBoot 快速、简洁的特性。
 
@@ -98,7 +98,7 @@ SpringBoot 还提供了其它启动方式，并且可以设置启动参数及配
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 使用 SpringBoot 搭建 Web 项目，其实内部还是 SpringMVC，但是，
 使用 SpringBoot 搭建 Web 项目比起曾经使用 SpringMVC 一步一步搭建项目明显快捷得多。

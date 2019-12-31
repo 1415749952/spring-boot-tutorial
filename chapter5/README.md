@@ -1,16 +1,13 @@
-第五章：SpringBoot项目中配置Filter
+五、配置过滤器
 ---
 
-### 课程目标
+### 目标
 
 学会在 SpringBoot 项目中配置 Filter，实现对请求出入参的日志打印。
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -19,21 +16,26 @@
 </parent>
 ```
 
-引入 `spring-boot-starter-web` 的依赖
-
+整体依赖如下所示
 ```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
 ```
 
 #### 编码
-
 1. 编写 Filter
 
 实现对 application/json 请求的拦截，因为请求内容使用流，所以需要多一次封装
-
 ```java
 public class TraceFilter extends GenericFilterBean {
 
@@ -88,7 +90,6 @@ public class TraceFilter extends GenericFilterBean {
 ```
 
 请求封装
-
 ```java
 public class TraceServletRequestWrapper extends HttpServletRequestWrapper {
 
@@ -114,7 +115,6 @@ public class TraceServletRequestWrapper extends HttpServletRequestWrapper {
 ```
 
 响应封装
-
 ```java
 public class TraceServletResponseWrapper extends HttpServletResponseWrapper {
 
@@ -147,7 +147,6 @@ public class TraceServletResponseWrapper extends HttpServletResponseWrapper {
 ```
 
 输入流封装
-
 ```java
 public class TraceServletInputStream extends ServletInputStream {
 
@@ -217,7 +216,6 @@ public class TraceServletInputStream extends ServletInputStream {
 ```
 
 输出流封装
-
 ```java
 public class TraceServletOutputStream extends ServletOutputStream {
 
@@ -268,7 +266,6 @@ public class TraceServletOutputStream extends ServletOutputStream {
 ```
 
 2. 注册 Filter
-
 ```java
 @Configuration
 public class WebConfig {
@@ -285,10 +282,9 @@ public class WebConfig {
 }
 ```
 
-3. 编写 controller 接口
+3. Controller 层代码
 
 使用 @RequestBody 方式接收参数
-
 ```java
 @RestController
 public class HelloController {
@@ -301,8 +297,7 @@ public class HelloController {
 }
 ```
 
-4. 编写项目启动类
-
+4. 启动类
 ```java
 @SpringBootApplication
 public class Application {
@@ -369,7 +364,7 @@ public class FilterTest {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 Filter 用途很多，本文主要不是讲解 Filter 如何使用，而是讲解如何在 SpringBoot 项目中进行 Filter 的注册。
 

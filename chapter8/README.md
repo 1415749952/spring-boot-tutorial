@@ -1,10 +1,8 @@
-第八章：SpringBoot整合hibernate-validator进行参数校验
+八、整合hibernate-validator优雅表单校验
 ---
 
-`spring-boot-starter-web` 项目中默认已经集成了 `hibernate-validator`
-
 ### 相关知识
-
+`spring-boot-starter-web` 项目中默认已经集成了 `hibernate-validator`
 #### 常用注解
 
 > JSR 303 Bean Validation
@@ -43,16 +41,12 @@ Range(min,max)|标注元素值必须在指定范围之内|数字值，或者其�
 URL(regexp,flags)|标注元素必须为格式正确的URL|字符串
 URL(protocol,host,port)|标注元素必须满足给定的协议主机和端口号|字符串
 
-### 课程目标
-
-本章将在[SpringBoot集成SpringBootJPA完成CURD]()的基础上，整合 hibernate-validator，对入参进行校验。
+### 目标
+整合 hibernate-validator，使用注解的方式对接口入参进行校验。
 
 ### 操作步骤
-
 #### 添加依赖
-
 `spring-boot-starter-web` 已经默认添加对 `hibernate-validator` 的依赖
-
 ```xml
 <dependencies>
     <dependency>
@@ -87,30 +81,20 @@ URL(protocol,host,port)|标注元素必须满足给定的协议主机和端口�
 
 #### 编码
 
-1. 为实体类添加校验规则
-
+1. 添加校验规则
 ```java
 @Getter
 @Setter
-public class UserBO {
+public class User {
 
-    /**
-     * 用户名，长度在6-16个字符之间，必须参数
-     */
     @NotBlank(message = "用户名不能为空")
     @Length(min = 6, max = 16, message = "用户名长度必须在6-16个字符之间")
     private String username;
 
-    /**
-     * 出生日期，格式为 yyyy-MM-dd，必须为过去的日期，不必须参数
-     */
     @Past(message = "出生日期必须早于当前日期")
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private LocalDate birthday;
 
-    /**
-     * 等级，整数，0-5之间，必须参数
-     */
     @NotNull(message = "用户等级不能为空")
     @Min(value = 0, message = "用户等级最小为0")
     @Max(value = 5, message = "用户等级最大为5")
@@ -157,6 +141,18 @@ public class UserController {
             return null;
         }
         return user;
+    }
+
+}
+```
+
+3. 启动类
+```java
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 
 }
@@ -221,7 +217,7 @@ public class UserTest {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 一个安全的接口需要对每一个入参进行校验，以保证参数合法性。
 

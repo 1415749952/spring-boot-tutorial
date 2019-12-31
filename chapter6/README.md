@@ -1,9 +1,11 @@
-第六章：SpringBoot切换Tomcat服务器为Undertow
+六、配置高性能服务器Undertow
 ---
 
-> undertow 是一个服务器，在相同资源使用量的情况下 undertow 比 tomcat 有更好的吞吐量和较低的访问时延
+### 相关知识
 
-### 课程目标
+undertow 是一个服务器，在相同资源使用量的情况下 undertow 比 tomcat 有更好的吞吐量和较低的访问时延
+
+### 目标
 
 替换 SpringBoot 的启动服务器 Tomcat 服务器为 Undertow 服务器
 
@@ -12,7 +14,6 @@
 #### 添加依赖
 
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -56,6 +57,6 @@ Started Application in 2.763 seconds (JVM running for 3.658)
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 Undertow 是一个比 Tomcat 性能更好的服务器，这是一个优化项。

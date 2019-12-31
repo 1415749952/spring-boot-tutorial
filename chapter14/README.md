@@ -1,14 +1,12 @@
-第十四章：SpringBoot定制自已专属的启动Banner
+十四、定制自已专属的启动Banner
 ---
 
-### 课程目标
+### 目标
 
 实现自定义Banner
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
 
 ```xml
@@ -18,8 +16,8 @@
     <version>2.0.5.RELEASE</version>
 </parent>
 ```
-引入 `spring-boot-starter-web` 依赖
 
+引入 `spring-boot-starter-web` 依赖
 ```xml
 <dependencies>
     <dependency>
@@ -64,7 +62,7 @@ banner.txt配置
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 更换 spring-boot 原本的 banner 为个性化的输出，可以输出公司 Logo 或者项目 Logo 什么的，增加参与成员对公司、项目、品牌的认同感
 

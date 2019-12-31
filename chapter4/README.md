@@ -1,16 +1,16 @@
-第四章：SpringBoot项目中配置拦截器
+四、配置拦截器
 ---
+
+### 相关知识
 
 关于拦截器的相关知识可参考：<https://jinnianshilongnian.iteye.com/blog/1670856>
 
-### 课程目标
+### 目标
 
 学会在 SpringBoot 的项目中怎么配置拦截器
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
 
 ```xml
@@ -21,19 +21,24 @@
 </parent>
 ```
 
-引入 `spring-boot-starter-web` 的依赖
-
+整体依赖如下所示
 ```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
 ```
 
 #### 编码
-
 1. 编写拦截器
-
 ```java
 public class TraceInterceptor implements HandlerInterceptor {
 
@@ -79,7 +84,6 @@ public class TraceInterceptor implements HandlerInterceptor {
 
 WebMvcConfigurer 接口提供了对 SpringMVC 的个性化配置。
 实现 WebMvcConfigurer 接口的 addInterceptors 方法进行拦截器的注册。
-
 ```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -97,8 +101,7 @@ public class WebConfig implements WebMvcConfigurer {
 }
 ```
 
-3. 编写 controller 接口
-
+3. Controller 层代码
 ```java
 @RestController
 public class HelloController {
@@ -111,8 +114,7 @@ public class HelloController {
 }
 ```
 
-4. 编写项目启动类
-
+4. 启动类
 ```java
 @SpringBootApplication
 public class Application {
@@ -125,9 +127,7 @@ public class Application {
 ```
 
 ### 验证结果
-
 编写测试用例
-
 ```java
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -163,6 +163,6 @@ public class TraceInterceptorTest {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 使用 SpringMVC 时是使用 XML 进行注册，SpringBoot 则推荐使用代码进行注册，最终结果其实是一样的，所以只需要知道操作步骤即可。

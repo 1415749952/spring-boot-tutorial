@@ -1,16 +1,12 @@
-第三章：SpringBoot项目使用测试用例
+三、测试用例
 ---
 
-### 课程目标
-
-基于上一章，使用测试用例实现对增删查改接口的测试
+### 目标
+编写测试用例，对已实现接口进行单元测试
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 `spring-boot-starter-test` 的依赖
-
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -19,8 +15,7 @@
 </dependency>
 ```
 
-添加依赖后的整体 dependencies 如下所示
-
+整体依赖如下所示
 ```xml
 <dependencies>
     <dependency>
@@ -93,9 +88,12 @@ public class UserTest {
  - 注解分析
 
 ```
-@RunWith(SpringRunner.class) // 指定 SpringRunner 作为单元测试的执行类，SpringRunner 是 spring-test 提供的测试执行单元类
-@WebAppConfiguration         // 模拟 ServletContext
-@SpringBootTest(classes = Application.class) // 指定测试启动类，配置文件以及环境
+// 指定 SpringRunner 作为单元测试的执行类，SpringRunner 是 spring-test 提供的测试执行单元类
+@RunWith(SpringRunner.class)
+// 模拟 ServletContext
+@WebAppConfiguration
+// 指定测试启动类，配置文件以及环境
+@SpringBootTest(classes = Application.class)
 ```
 
  - MockMvc 用于向 controller 接口发起模拟请求
@@ -104,16 +102,16 @@ public class UserTest {
 
 ### 验证结果
 
-选择测试用例，右键选择 Run
+选择测试用例，右键选择 Run，执行单元测试，查看测试结果
 
 ### 源码地址
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 请为自己的所有方法编写测试用例
 
-### 参考
+### 参考资料
 
  - <https://blog.csdn.net/u010002184/article/details/81174153>

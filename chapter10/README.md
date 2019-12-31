@@ -1,4 +1,4 @@
-第十章：SpringBoot整合MapStruct优雅复制属性
+十、整合MapStruct优雅复制属性
 ---
 
 在之前章节的例子中，我们在接收参数的时候都是使用的 User 类对象，这是一个 DO 对象，
@@ -8,31 +8,24 @@
 而 MapStruct 则是另外一种解决方案。
 
 ### 相关知识
-
 MapStruct官网：<http://mapstruct.org>
 
-### 课程目标
+### 目标
+整合 MapStruce 以及 Lombok
 
-SpringBoot 整合 MapStruce 以及 Lombok
+### 准备工作
+ - Idea 集成开发环境
 
-### 操作步骤
-
-本文使用 Idea 集成开发环境
-
-#### 环境准备
-
-1. 安装 MapStruce 插件
-
+#### 安装 MapStruct 插件
 File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选项，再在右侧查询 MapStruce，点击安装。
 
-2. 设置IDE
-
+#### 设置
 File -> Settings 打开设置界面，
 选择 Build,Execution,Deployment -> Compiler -> Annotation Processors 进入设置界面，
 勾选 enable annotation processing
 
+### 操作步骤
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
 ```xml
 <parent>
@@ -80,8 +73,7 @@ File -> Settings 打开设置界面，
 </plugin>
 ```
 
-添加后的整体依赖如下
-
+整体依赖如下
 ```xml
 <dependencies>
    <dependency>
@@ -149,10 +141,8 @@ File -> Settings 打开设置界面，
 </build>
 ```
 
-### 编码
-
-1. 编写 BO 类，用于接收前端入参
-
+#### 编码
+1. BO 层代码，用于接收前端入参
 ```java
 @Getter
 @Setter
@@ -164,12 +154,10 @@ public class UserBO {
 }
 ```
 
-2. 编写 Mappering 转换器
-
- - 类上添加 `@Mapper` 注解，用于项目启动时自动加载
- - 方法上添加 `@Mapping` 注解，用于设置转换规则
- - 设置常量 `INSTANCE`，用于其它方法调用，也可以通过 Spring 的 IOC 进行注入
-
+2. MapStruct 接口
+ - 类上添加 `@Mapper` 注解，项目编译时，MapStruct 将自动为该接口生成实现类
+ - 方法上添加 `@Mapping` 注解，用于设置规则
+ - 设置常量 `INSTANCE`，供其它类调用，也可以通过 Spring 的 IOC 进行注入
 ```java
 @Mapper
 public interface UserMapper {
@@ -182,8 +170,7 @@ public interface UserMapper {
 }
 ```
 
-3. 编写 controller 接口
-
+3. Controller 层代码
 ```java
 @RestController
 @Slf4j
@@ -200,10 +187,20 @@ public class UserController {
 }
 ```
 
+4. 启动类
+```java
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
 ### 验证结果
-
-编写测试用例
-
+#### 测试用例
 ```java
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -237,10 +234,34 @@ public class UserTest {
 }
 ```
 
+输出如下
+```
+{"id":null,"name":"13700000001","sex":null,"birthday":null,"level":null}
+```
+
+#### 编译项目
+在项目的 target 子目录下可以找到 UserMapperImpl.class 文件，这个就是 MapStruct 在编译期自动生成实现类
+```java
+public class UserMapperImpl implements UserMapper {
+    public UserMapperImpl() {
+    }
+
+    public User bo2Do(UserBO bo) {
+        if (bo == null) {
+            return null;
+        } else {
+            User user = new User();
+            user.setName(bo.getMobile());
+            return user;
+        }
+    }
+}
+```
+
 ### 源码地址
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
-MapStruct 释放掉大量的属性复制的代码，改为编译时自动生成，所以只是精简了项目代码。
+MapStruct 释放掉大量的属性复制的代码，改为编译期自动生成，精简了项目代码同时也保证了高性能

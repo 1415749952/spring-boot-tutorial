@@ -1,9 +1,8 @@
-第十一章：SpringBoot整合Swagger2
+十一、整合Swagger2自动生成API文档
 ---
 
-Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。
-
 ### 相关知识
+Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。
 
 Swagger官网：<https://swagger.io>
 
@@ -17,16 +16,12 @@ Swagger官网：<https://swagger.io>
  - @ApiImplicitParam 用于方法，表示单独的请求参数
  - @ApiImplicitParams 用于方法，包含多个 @ApiImplicitParam
 
-### 课程目标
-
-整合 Swagger2 实现自动生成文档
+### 目标
+整合 Swagger2 实现自动生成接口文档
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -36,7 +31,6 @@ Swagger官网：<https://swagger.io>
 ```
 
 添加 `Swagger2` 的依赖
-
 ```xml
 <dependency>
     <groupId>io.springfox</groupId>
@@ -50,8 +44,7 @@ Swagger官网：<https://swagger.io>
 </dependency>
 ```
 
-添加后的整体依赖如下
-
+整体依赖如下
 ```xml
 <dependencies>
     <dependency>
@@ -96,10 +89,7 @@ Swagger官网：<https://swagger.io>
 </dependencies>
 ```
 
-### 编码
-
-1. 新建配置类
-
+#### 注册 Swagger2
 ```java
 /**
  * @Configuration 用于启动自动加载
@@ -142,7 +132,10 @@ public class SwaggerAutoConfiguration {
 }
 ```
 
-2. 为接口添加 swagger 注解
+#### 编码
+1. Controller 层代码
+
+为接口添加 Swagger 注解
 
 ```java
 @RestController
@@ -159,7 +152,9 @@ public class UserController {
 }
 ```
 
-3. 为入参添加 swagger 注解
+2. 入参代码
+
+为入参类及类中的每一个属性添加 Swagger 注解
 
 ```java
 @Getter
@@ -185,6 +180,6 @@ public class UserBO {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 Swagger 可以实时生成文档，保证文档的时效性，这有助于前后端联合开发、微服务联合开发等

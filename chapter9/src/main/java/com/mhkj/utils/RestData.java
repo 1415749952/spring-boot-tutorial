@@ -1,10 +1,12 @@
 package com.mhkj.utils;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class RestData<T> {
 
     private static final String SUCCESS_INFO = "操作成功";
@@ -17,12 +19,6 @@ public class RestData<T> {
     // 返回数据
     private T data;
 
-    public static <T> RestData<T> build() {
-        return new RestData<>();
-    }
-
-    public RestData() {}
-
     private RestData(boolean status, String info) {
         this.status = status;
         this.info = info;
@@ -30,8 +26,6 @@ public class RestData<T> {
 
     /**
      * 操作是否成功
-     *
-     * @return true | false
      */
     public boolean isSuccess() {
         return this.status;

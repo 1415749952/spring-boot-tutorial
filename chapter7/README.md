@@ -1,4 +1,4 @@
-第七章：SpringBoot集成Lombok让项目更简洁
+七、整合Lombok让项目更简洁
 ---
 
 在常规的实体类中，我们会对该类中所有字段生成 get / set 方法，遇到字段比较多的，这些方法会占用大量代码篇幅。
@@ -13,16 +13,12 @@ Lombok官网：<https://projectlombok.org/>
 一、@Setter | @Getter
 
 提供无参构造方法以及 getter、setter 方法
-
 ```
 @Getter
 @Setter
 public class User1 {
-
     private Long id;
-
     private String username;
-
 }
 ```
 
@@ -33,117 +29,90 @@ public class User1 {
  - includeFieldNames 是否包含属性名
  - exclude 排除指定属性
  - callSuper 是否包含父类属性
-
 ```
 @ToString
 public class User2 {
-
     private Long id;
-
     private String username;
-
 }
 ```
 
 三、@EqualsAndHashCode
 
 提供无参构造方法以及 equals、hashCode 方法
-
 ```
 @EqualsAndHashCode
 public class User3 {
-
     private Long id;
-
     private String username;
-
 }
 ```
 
 四、@AllArgsConstructor
 
 提供一个全参数的构造方法，默认不提供无参构造
-
 ```
 @AllArgsConstructor
 public class User4 {
-
     private Long id;
-
     private String username;
-
 }
 ```
 
 五、@NoArgsConstructor
 
 提供一个无参构造
-
 ```
 @NoArgsConstructor
 public class User5 {
-
     private Long id;
-
     private String username;
-
 }
 ```
 
 六、@Data
 
 结合了@ToString，@EqualsAndHashCode，@Getter、@Setter、@NoArgsConstructor
-
 - staticConstructor 生成静态工厂方法的方法名，如果设置了该参数，则生成的无参构造方法将被置为私有的。
-
 ```
 @Data
 public class User4 {
-
     private Long id;
-
     private String username;
-
 }
 ```
 
 七、@Slf4j
 
 提供 org.slf4j.Logger 变量，变量名为 log
-
 ```
 @Slf4j
 @RestController
 public class UserController {
-
     @GetMapping("/listUser")
     public List<User1> listUser() {
         log.error("log with lombok");
         return null;
     }
-
 }
 ```
 
-### 课程目标
+### 目标
 
-本章将在[SpringBoot集成SpringBootJPA完成CURD]()的基础上，整合 lombok，实现对数据库表的操作。
-以及熟悉并学会使用 lombok，简化项目代码
+本章将在[集成SpringBootJPA完成CURD]()的代码基础上，整合 lombok，实现对数据库表的操作。
+学习使用 lombok，简化项目代码
 
-### 操作步骤
+### 准备工作
 
-本文使用 Idea 集成开发环境
+ - Idea 集成开发环境
 
-#### 环境准备
-
-安装 lombok 插件
+#### 安装 lombok 插件
 
 File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选项，再在右侧查询 lombok，点击安装。
 
+### 操作步骤
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -153,7 +122,6 @@ File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选�
 ```
 
 添加 `lombok` 的依赖
-
 ```xml
 <dependency>
     <groupId>org.projectlombok</groupId>
@@ -163,7 +131,6 @@ File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选�
 ```
 
 同时添加对 `spring-boot-starter-test` 的依赖，用于进行单元测试，完整依赖如下
-
 ```xml
 <dependencies>
     <dependency>
@@ -207,8 +174,7 @@ File -> settings，打开 Idea 的设置界面，从左侧栏选择 Plugins 选�
 ```
 
 #### 编码
-
-改写实体类
+1. Entity 代码
 
 将 User 类的 get / set 方法全部删除，在类上添加注解 @Data。
 
@@ -259,7 +225,7 @@ public class User {
 }
 ```
 
-修改后的代码如下，可以看到整个类的代码变得非常清爽
+修改后的代码如下，去除了所有 get/set 方法，代码变得简洁，方便后期阅读及修改
 ```java
 @Data
 @Entity
@@ -276,13 +242,13 @@ public class User {
 }
 ```
 
-UserRepository 保持不变
+2. Repository 层代码
 ```java
 public interface UserRepository extends JpaRepository<User, Long> {
 }
 ```
 
-改写 Controller 类
+3. Controller 层代码
  - 添加 @Slf4j 注解，使用 `log.debug` 进行日志打印
  - 添加 @AllArgsConstructor 注解，同时去除 UserRepository 属性上的 @Autowired 注解，使用 Spring 推荐的构造方法注入
 ```java
@@ -323,10 +289,20 @@ public class UserController {
 }
 ```
 
+4. 启动类
+```java
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
 ### 验证结果
-
 编写测试用例
-
 ```java
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -371,6 +347,6 @@ public class UserTest {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 Lombok 只是为了减少一些无关紧要的代码，减少编码的工作量，并不会减少程序的复杂度，这部分代码会在项目编译期间自动生成。

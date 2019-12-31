@@ -1,4 +1,4 @@
-第十二章：SpringBoot整合MybatisPlus
+十二、整合MybatisPlus
 ---
 
 ### 相关知识
@@ -21,17 +21,14 @@ Swagger官网：<https://mp.baomidou.com/>
  - 内置性能分析插件：可输出 Sql 语句以及其执行时间，建议开发测试时启用该功能，能快速揪出慢查询
  - 内置全局拦截插件：提供全表 delete 、 update 操作智能分析阻断，也可自定义拦截规则，预防误操作
 
-### 课程目标
+### 目标
 
 在 [第二章：SpringBoot集成SpringBootJPA完成CURD](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter2) 的代码基础上，
 替换 spring-data-jpa 为 mybatis-plus，熟悉在 mybatis-plus 下实现单表数据的CURD编码
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -41,7 +38,6 @@ Swagger官网：<https://mp.baomidou.com/>
 ```
 
 添加 `mybatis-plus` 的依赖
-
 ```xml
 <dependency>
     <groupId>com.baomidou</groupId>
@@ -51,7 +47,6 @@ Swagger官网：<https://mp.baomidou.com/>
 ```
 
 添加后的整体依赖如下，在原来的基础上去除了对 `spring-boot-starter-data-jpa` 的依赖
-
 ```xml
 <dependencies>
     <dependency>
@@ -96,7 +91,6 @@ Swagger官网：<https://mp.baomidou.com/>
 ```
 
 #### 配置
-
 配置文件 application.yml 中配置数据源，mybatis-plus 也有很多可配置项，具体参考官方文档
 ```yaml
 spring:
@@ -107,8 +101,7 @@ spring:
 ```
 
 #### 编码
-
-1. 编写实体类 User
+1. Entity 层代码
 
  - 类上添加注解 @TableName，如果表名与实体名不一致，可自行设置
  - 主键添加注解 @TableId，可设置主键生成规则，本例使用 `AUTO`，表示使用数据库自增
@@ -140,7 +133,7 @@ public class User {
 }
 ```
 
-2. 编写 Repository 类
+2. Repository 层代码
 
 Mybatis-plus 提供的 BaseMapper 接口已经实现了对单表的增删查改操作以及一些其它常用的方法，可以同使用 JPA 接口一样直接调用，而不用去 mybatis 的配置文件中编写 SQL。
 
@@ -154,7 +147,7 @@ public interface UserRepository extends BaseMapper<User> {
 }
 ```
 
-3. 编写 Service 类
+3. Service 层代码
 
 创建接口 UserService，继承 mybatis-plus 提供的 IService 通用接口，IService 中已经实现了基础的 CURD 方法
 ```java
@@ -168,7 +161,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 }
 ```
 
-4. 编写 Controller 接口
+4. Controller 层代码
 
 创建 controller 类，实现增删查改交换接口
 
@@ -201,6 +194,18 @@ public class UserController {
     public List<User> update(User user) {
         userService.updateById(user);
         return userService.list();
+    }
+
+}
+```
+
+5. 启动类
+```java
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 
 }
@@ -248,7 +253,7 @@ public class UserTest {
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 Mybatis-plus 在 mybatis 的基础上实现通用 Mapper 以及通用 Service，极大地简化了开发过程，让开发人员从 SQL 组装中脱离出来，专心处理业务逻辑
 

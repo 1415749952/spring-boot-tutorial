@@ -1,8 +1,7 @@
-第十五章：SpringBoot使用AOP记录操作日志
+十五、使用AOP记录操作日志
 ---
 
 ### 相关知识
-
 AOP 即面对切面编程，是 Spring 框架的两大核心特性之一。
 
 #### 相关概念
@@ -15,16 +14,12 @@ AOP 即面对切面编程，是 Spring 框架的两大核心特性之一。
  - AOP代理（AOP Proxy）：AOP框架创建的对象，用来实现切面契约（例如通知方法执行等等）。在Spring中，AOP代理可以是JDK动态代理或者CGLIB代理。
  - 织入（Weaving）：把切面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象。这些可以在编译时（例如使用AspectJ编译器），类加载时和运行时完成。Spring和其他纯Java AOP框架一样，在运行时完成织入。
 
-### 课程目标
-
+### 目标
 通过 AOP 的方式，监控客户端对Controller方法的操作，记录操作日志。
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -34,7 +29,6 @@ AOP 即面对切面编程，是 Spring 框架的两大核心特性之一。
 ```
 
 添加 `spring-boot-starter-aop` 的依赖
-
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -81,17 +75,6 @@ AOP 即面对切面编程，是 Spring 框架的两大核心特性之一。
 ```
 
 #### 编码
-
-准备一个简单的BO对象，用于接收入参
-```java
-@Data
-public class UserBO {
-    private String mobile;
-    private String upwd;
-    private Integer sex;
-}
-```
-
 准备一个自定义注解SysLog，对需要监控的方法进行标记
 ```java
 @Target(ElementType.METHOD)

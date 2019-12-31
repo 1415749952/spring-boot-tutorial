@@ -1,4 +1,4 @@
-第十三章：SpringBoot整合fluent-validator优雅业务校验
+十三、整合fluent-validator优雅业务校验
 ---
 
 ### 相关知识
@@ -17,16 +17,12 @@ github地址：<https://github.com/neoremind/fluent-validator>
  - Spring良好集成
  - 回调给予你充分的自由度，验证过程中发生的错误、异常，验证结果的返回，开发人员都可以定制。
 
-### 课程目标
-
+### 目标
 替换 hibernate-validator 为 fluent-validator，实现对入参的校验及异常输出
 
 ### 操作步骤
-
 #### 添加依赖
-
 引入 Spring Boot Starter 父工程
-
 ```xml
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -36,7 +32,6 @@ github地址：<https://github.com/neoremind/fluent-validator>
 ```
 
 添加 `fluent-validator` 的依赖
-
 ```xml
 <dependency>
 	<groupId>com.baidu.unbiz</groupId>
@@ -77,7 +72,6 @@ fluent-validator 集成 spring 需要添加依赖
 ```
 
 添加后的整体依赖如下
-
 ```xml
 <dependencies>
     <dependency>
@@ -134,11 +128,10 @@ fluent-validator 集成 spring 需要添加依赖
 </dependencies>
 ```
 
-#### 注册
-
+#### 注册 Fluent-validator
 fluent-validate 与 spring 结合使用 annotation 方式进行参数校验，需要借助于 spring 的 AOP，fluent-validate 提供了处理类 FluentValidateInterceptor，但是 fluent-validate 提供的默认验证回调类 DefaultValidateCallback 对校验失败的情况并没有处理，所以需要自行实现一个
 
-1. 实现自定义异常回调类
+1. 自定义异常回调类
 ```java
 public static class HussarValidateCallBack extends DefaultValidateCallback implements ValidateCallback {
     @Override
@@ -158,7 +151,7 @@ public static class HussarValidateCallBack extends DefaultValidateCallback imple
 }
 ```
 
-2. 注册 Bean
+2. 注册 IOC
 
 注册 ValidateCallback 及 FluentValidateInterceptor，并且配置一个 AOP 规则
 
@@ -266,6 +259,18 @@ public class UserController {
 }
 ```
 
+3. 启动类
+```java
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+```
+
 ### 验证结果
 
 编写测试用例
@@ -318,7 +323,7 @@ MockHttpServletResponse:
 
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 总结
+### 结束语
 
 fluent-validate 可以全方位兼容 hibernate-validate，基于 spring 的 AOP 可以提供基于注解的方法入参校验，同时也可以提供流式编程的工具类业务校验，替代 hibernate-validate 的同时提供了更多扩展性。
 

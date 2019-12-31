@@ -21,9 +21,9 @@ public class RestExceptionHandler {
         log.error("MethodArgumentNotValidException handler", e);
         BindingResult bindingResult = e.getBindingResult();
         if (bindingResult.hasFieldErrors()) {
-            return RestData.build().error(bindingResult.getFieldError().getDefaultMessage());
+            return new RestData().error(bindingResult.getFieldError().getDefaultMessage());
         }
-        return RestData.build().error("parameter is not valid");
+        return new RestData().error("parameter is not valid");
     }
 
     /**
@@ -33,7 +33,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = HttpMessageConversionException.class)
     public RestData handler(HttpMessageConversionException e) {
         log.error("HttpMessageConversionException handler", e);
-        return RestData.build().error(e.getMessage());
+        return new RestData().error(e.getMessage());
     }
 
     /**
@@ -42,7 +42,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public RestData handler(Exception e) {
         log.error("exception handler", e);
-        return RestData.build().error(e.getMessage());
+        return new RestData().error(e.getMessage());
     }
 
 }

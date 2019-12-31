@@ -340,7 +340,7 @@ public void beforeAdvide(JoinPoint point, Object proxy){
 
 将参数传入到通知方法中
 ```
-@Before("pintCut() && args(age,username)")
+@Before("pointCut() && args(age,username)")
 public void beforeAdvide(JoinPoint point, int age, String username){
     //处理逻辑
 }

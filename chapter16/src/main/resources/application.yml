@@ -1,8 +1,8 @@
 spring:
   mail:
     host: smtp.126.com
-    username: gongm_24@126.com
-    password: hmily52mg@2014
+    username: 123456@126.com
+    password: xxxx
     properties:
       mail:
         smtp:

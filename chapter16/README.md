@@ -61,7 +61,7 @@
  - password：用于发送邮件的邮箱的密码
  - smtp.auth：设置发送邮件需要进行权限校验
 
-```yml
+```yaml
 spring:
   mail:
     host: smtp.126.com
@@ -259,7 +259,7 @@ public class UserTest {
 
 ##### 配置
 在 application.yml 中进行配置，配置了 freemarker 模板文件的位置
-```yml
+```yaml
 spring
   freemarker:
     template-loader-path: classpath:/templates/
@@ -323,7 +323,7 @@ public void testSendFreemarker() throws Exception {
 ```
 ##### 配置
 在 application.yml 中进行配置，配置了 thymeleaf 模板文件的位置，注意最后的反斜杠，一定不能少
-```yml
+```yaml
 spring
   thymeleaf:
     prefix: classpath:/templates/

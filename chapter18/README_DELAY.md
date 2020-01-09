@@ -169,12 +169,12 @@ public class MqTest {
 ```mermaid 
 flowchat
 st=>start: 客户端发送消息
-e=>end: 结束
+e=>end: 消费消息
 op1=>operation: 业务队列
 op2=>operation: 延迟队列
-op3=>operation: 等待消息过期
-op4=>operation: 死信队列
-op5=>operation: 消费消息
+cond1=>condition: 等待消息过期
+op3=>operation: 死信队列
 
-st->op1->op2->->op3->op4->op5
+st->op1->op2->cond1
+cond1(yes)->op3->e
 ```

@@ -1,0 +1,19 @@
+spring:
+  rabbitmq:
+    host: 49.235.247.175
+    port: 5672
+    username: admin
+    password: admin
+    listener:
+      type: simple
+      simple:
+        acknowledge-mode: manual
+  mail:
+    host: smtp.126.com
+    username: gongm_24@126.com
+    password: hmily52mg@2014
+    properties:
+      mail:
+        smtp:
+          auth: true
+

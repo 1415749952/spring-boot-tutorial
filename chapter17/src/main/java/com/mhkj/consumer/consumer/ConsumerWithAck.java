@@ -23,11 +23,12 @@ public class ConsumerWithAck {
         @RabbitHandler
         public void process(Map obj, Channel channel, Message message) throws IOException {
             try {
-                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-                System.out.println("DirectQueue消费者收到消息并ACK返回  : " + obj.toString());
+//                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+                System.out.println("DirectQueue消费者收到消息并NACK返回  : " + obj.toString());
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
             } catch (Exception e) {
                 e.printStackTrace();
-                channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
             }
         }
     }

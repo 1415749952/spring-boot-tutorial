@@ -38,7 +38,7 @@ public class MqTest {
                 MockMvcRequestBuilders
                 .post("/sendDirectMessage")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("test send direct message")
+                .content("test send direct message 3")
         )
         .andDo(MockMvcResultHandlers.print())
         .andReturn();

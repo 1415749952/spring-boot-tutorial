@@ -3,6 +3,16 @@
 
 ### 相关知识
 
+#### 元素
+ - 交换器
+ - 队列
+ - 绑定
+ - 虚拟主机
+
+#### 几个重要的交换器
+ - direct：一对一
+ - fanout：一对多
+ - topic：一对多匹配
 
 ### 目标
 整合 Spring boot 提供的 `spring-boot-starter-amqp`，实现消息发送、消息消费、确认
@@ -266,6 +276,9 @@ spring:
 ```
 
 ##### 定义消费类
+basicReject 的第二个参数是 requeue，意思是是否重新加入队列，
+如果为 true，则表示本次消费不成功，并将当前消息重新加入至当前队列，
+如果为 false，则表示本次消费不成功，并将当前消息丢弃，如果有设置死信队列，则会进入死信队列（关于死信队列，在下一章会讲）
 ```java
 @Component
 @RabbitListener(queues = "TestDirectQueue")
@@ -277,7 +290,7 @@ public class ConsumerDirectQueue {
             System.out.println("DirectQueue消费者收到消息并ACK返回  : " + obj.toString());
         } catch (Exception e) {
             e.printStackTrace();
-            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+            channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
         }
     }
 }

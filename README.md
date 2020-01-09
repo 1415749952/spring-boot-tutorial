@@ -14,7 +14,11 @@
  - [第十二章：整合Mybatis-plus](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter12)
  - [第十三章：整合fluent-validator优雅业务校验](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter13)
  - [第十四章：定制自已专属的启动Banner](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter14)
- - [第十五章：使用AOP记录操作日志](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter15)
+ - [第十五章：整合AOP记录操作日志](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter15)
+ - [第十六章：整合Mail发送邮件](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter16)
+ - [第十七章：整合RabbitMQ之ACK消息确认](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter17)
+ - [第十八章：整合RabbitMQ之死信队列](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter18)
+ - [第十九章：整合RabbitMQ之延迟队列](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter18/README_DELAY.md)
  
 ### 参考资料 
 官方样例：<https://github.com/ityouknow/spring-boot-examples>

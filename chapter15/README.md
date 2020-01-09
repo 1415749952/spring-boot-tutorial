@@ -240,7 +240,7 @@ public class UserTest {
  - <https://www.cnblogs.com/lic309/p/4079194.html>
  - <https://blog.csdn.net/lmb55/article/details/82470388>
 
-### 总结
+### 结束语
 
 AOP 作为 Spring 框架两个最重要特性之一，在框架层面应用居多。
 本例实现了对请求进行日志输出，也可以结合之前的课程，将日志记录至数据库。

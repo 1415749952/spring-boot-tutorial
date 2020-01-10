@@ -20,6 +20,7 @@
  - [第十八章：整合RabbitMQ之死信队列](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter18)
  - [第十九章：整合RabbitMQ之实现延迟队列](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter18/README_DELAY.md)
  - [第二十章：整合RabbitMQ实现异步发送邮件](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter20)
+ - [第二十一章：整合Redis](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter21)
  
 ### 参考资料 
 官方样例：<https://github.com/ityouknow/spring-boot-examples>

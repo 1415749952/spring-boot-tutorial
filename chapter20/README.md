@@ -1,25 +1,26 @@
-二十、整合RabbitMQ实现异步发送邮件
+二十、整合RabbitMQ实现定时发送邮件
 ---
 
-### 相关知识
-#### 什么是死信队列
-“死信”是RabbitMQ中的一种消息机制，当你在消费消息时，如果队列里的消息出现以下情况：
- - 消息被否定确认，使用 channel.basicNack 或 channel.basicReject ，并且此时requeue 属性被设置为false。
- - 消息在队列的存活时间超过设置的TTL时间。
- - 消息队列的消息数量已经超过最大队列长度。
-
-那么该消息将成为“死信”，“死信”消息会被RabbitMQ进行特殊处理。
-如果配置了死信队列信息，那么该消息将会被丢进死信队列中，如果没有配置，则该消息将会被丢弃。
-
-#### 应用场景
-当一个队列中的消息必须要被正确消费，但是却无法被正确消费，有很多情况可能导致出现这个问题，
-可能是消息本身的数据导致业务无法通过校验，也可能是相关服务宕机导致，甚至可能只是网络波动导致。
-此时该消息不能确认，也不能丢弃，更不能一直 requeue，那将变成一个死循环，
-这种消息不能一直呆在当前业务队列阻塞其它消息，但又需要处理，把它们导航至死信队列就是一种解决办法，
-通过订阅死信队列可以对此类消息进行例外处理，例如通知相关人员检查数据进行人工处理。
-
 ### 目标
-整合 Spring boot 提供的 `spring-boot-starter-amqp`，实现消息消费失败转死信队列
+整合 RabbitMQ 及 Mail 实现异步发送邮件及定时发送邮件。
+
+流程如下：
+```mermaid 
+flowchat
+st=>start: 客户端发送邮件
+e=>end: 消费消息
+cond1=>condition: 是否定时
+op1=>operation: 发送即时邮件
+op2=>operation: 发送定时邮件
+op3=>operation: 邮件队列(MailQueue)
+op4=>operation: 延迟邮件队列(EmailDelayQueue)
+cond2=>condition: 是否到期
+
+st->cond1
+cond1(no)->op1->op3->e
+cond1(yes, bottom)->op2->op4->cond2
+cond2(yes)->op3->e
+```
 
 ### 操作步骤
 #### 添加依赖
@@ -32,11 +33,16 @@
 </parent>
 ```
 
-添加 `spring-boot-starter-amqp` 的依赖
+添加 RabbitMQ 及 Mail 的依赖
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
 </dependency>
 ```
 
@@ -58,6 +64,11 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-amqp</artifactId>
     </dependency>
+    
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
 
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -66,87 +77,11 @@
     </dependency>
 </dependencies>
 ```
-#### 编码(发送方)
-#### 配置
-```yaml
-spring:
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: admin
-    password: admin
-```
-##### 定义队列
-定义一个测试队列 TestDeadQueue，并为该队列配置死信队列，
-配置的方法就是在声明队列的时候，添加参数 `x-dead-letter-exchange` 及 `x-dead-letter-routing-key`，
-其实就是在消费失败时，将消息使用该 exchange 及 routing 发送至指定队列
-```java
-@Configuration
-public class DeadConfig {
-
-    @Bean
-    public Queue testDeadQueue() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("x-dead-letter-exchange", "DeadExchange");
-        params.put("x-dead-letter-routing-key", "DeadRouting");
-        return new Queue("TestDeadQueue",true, false, false, params);
-    }
-
-    @Bean
-    DirectExchange testDeadExchange() {
-        return new DirectExchange("TestDeadExchange");
-    }
-
-    @Bean
-    Binding bindingTestDeadQueue() {
-        return BindingBuilder.bind(testDeadQueue()).to(testDeadExchange()).with("TestDeadRouting");
-    }
-
-    @Bean
-    public Queue deadQueue() {
-        return new Queue("DeadQueue",true);
-    }
-
-    @Bean
-    DirectExchange deadExchange() {
-        return new DirectExchange("DeadExchange");
-    }
-
-    @Bean
-    Binding bindingDeadQueue() {
-        return BindingBuilder.bind(deadQueue()).to(deadExchange()).with("DeadRouting");
-    }
-
-}
-```
-
-##### 测试发送
-```java
-@RunWith(SpringRunner.class)
-@WebAppConfiguration
-@SpringBootTest(classes = SenderApplication.class)
-public class MqTest {
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @Test
-    public void testDeadQueue() throws Exception {
-        String msgId = String.valueOf(UUID.randomUUID());
-        String sendTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        Map<String,Object> map = new HashMap<>(4);
-        map.put("msgId", msgId);
-        map.put("msgData", "test dead letter queue");
-        map.put("sendTime", sendTime);
-        rabbitTemplate.convertAndSend("TestDeadExchange", "TestDeadRouting", map);
-    }
-
-}
-```
 
 #### 编码(消费方)
+消费方监听队列 `EmailQueue`，实现发送邮件
+
 ##### 配置
-配置消费消息使用手动确认模式
 ```yaml
 spring:
   rabbitmq:
@@ -158,61 +93,142 @@ spring:
       type: simple
       simple:
         acknowledge-mode: manual
+  mail:
+    host: smtp.126.com
+    username: gongm_24@126.com
+    password: hmily52mg@2014
+    properties:
+      mail:
+        smtp:
+          auth: true
 ```
+
 ##### 定义队列
 ```java
 @Configuration
-public class Config {
+public class MqConfig {
 
     @Bean
-    public Queue testDirectQueue() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("x-dead-letter-exchange", "TestDeadExchange");
-        params.put("x-dead-letter-routing-key", "TestDeadRouting");
-        return new Queue("TestDeadQueue",true, false, false, params);
+    public Queue emailQueue() {
+        return new Queue("EmailQueue",true);
     }
-
-    @Bean
-    public Queue TestDeadQueue() {
-        return new Queue("DeadQueue",true);
-    }
-
 }
 ```
 
-##### 消费
-定义队列 TestDirectQueue 的消费方法，在方法中调用了 basicReject 方法，用于告诉 RabbitMQ 消费失败，
-调用 basicReject 方法时 requeue 参数必须为 false，不然就会把消息重新加入当前队列，
-由于队列 TestDirectQueue 配置了死信队列，于是 RabbitMQ 在接收到消费失败的 ACK 后，
-将当前消息根据配置的 exchange 及 routing 进行再次发送，并从当前队列中删除，
-消息最终被发送至队列 DeadQueue。
-
+##### 监听队列实现邮件发送
 ```java
+@AllArgsConstructor
 @Component
-public class ConsumerWithAck {
+public class EmailConsumer {
 
-    @RabbitListener(queues = "TestDeadQueue")
-    @RabbitHandler
-    public void process(Map obj, Channel channel, Message message) throws IOException {
-        try {
-            System.out.println("DirectQueue消费者收到消息并NACK返回  : " + obj.toString());
-            channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
-        }
-    }
+    private MailProperties properties;
+    private JavaMailSender mailSender;
 
-    @RabbitListener(queues = "DeadQueue")
+    @RabbitListener(queues = "EmailQueue")
     @RabbitHandler
-    public void processDead(Map obj, Channel channel, Message message) throws IOException {
+    public void process(Channel channel, Message message) throws IOException {
         try {
-            System.out.println("DeadQueue消费者收到消息并ACK返回  : " + obj.toString());
+            Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+            Email email = (Email) converter.fromMessage(message);
+            doSend(email);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
             channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
         }
+    }
+
+    public void doSend(Email mail) throws Exception {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(properties.getUsername());
+        message.setTo(mail.getTo());
+        message.setSubject(mail.getSubject());
+        message.setText(mail.getContent());
+        mailSender.send(message);
+    }
+
+}
+```
+
+#### 编码(发送方)
+##### 配置
+```yaml
+spring:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: admin
+```
+##### 定义队列
+定义一个邮件队列，消费端监听该队列，实现邮件异步发送
+定义一个延迟邮件队列，该队列中的消息到期则自动转入邮件队列。
+```java
+@Configuration
+public class MqConfig {
+
+    @Bean
+    public Queue emailQueue() {
+        return new Queue("EmailQueue",true);
+    }
+
+    @Bean
+    DirectExchange emailExchange() {
+        return new DirectExchange("EmailExchange");
+    }
+
+    @Bean
+    Binding bindingEmailQueue() {
+        return BindingBuilder.bind(emailQueue()).to(emailExchange()).with("EmailRouting");
+    }
+
+    @Bean
+    public Queue emailDelayQueue() {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("x-dead-letter-exchange", "EmailExchange");
+        params.put("x-dead-letter-routing-key", "EmailRouting");
+        return new Queue("EmailDelayQueue",true, false, false, params);
+    }
+
+    @Bean
+    DirectExchange emailDelayExchange() {
+        return new DirectExchange("EmailDelayExchange");
+    }
+
+    @Bean
+    Binding bindingEmailDelayQueue() {
+        return BindingBuilder.bind(emailDelayQueue()).to(emailDelayExchange()).with("EmailDelayRouting");
+    }
+
+}
+```
+
+##### Service 层代码
+```java
+@AllArgsConstructor
+@Service
+public class MailService {
+
+    private RabbitTemplate rabbitTemplate;
+    // 即时发送
+    public void send(String to, String subject, String content) {
+        Email mail = new Email();
+        mail.setTo(to);
+        mail.setSubject(subject);
+        mail.setContent(content);
+        rabbitTemplate.convertAndSend("EmailExchange", "EmailRouting", mail);
+    }
+    // 定时发送
+    public void send(String to, String subject, String content, LocalDateTime time) {
+        Email mail = new Email();
+        mail.setTo(to);
+        mail.setSubject(subject);
+        mail.setContent(content);
+        rabbitTemplate.convertAndSend("EmailDelayExchange", "EmailDelayRouting", mail, msg -> {
+            Duration duration = Duration.between(LocalDateTime.now(), time);
+            msg.getMessageProperties().setExpiration(String.valueOf(duration.toMillis()));
+            return msg;
+        });
     }
 
 }
@@ -221,23 +237,3 @@ public class ConsumerWithAck {
 ### 源码地址
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
-### 结束语
-死信队列其实并没有什么神秘的地方，不过是绑定在死信交换机上的普通队列，而死信交换机也只是一个普通的交换机，不过是用来专门处理死信的交换机。
-
-总结一下死信消息的生命周期：
-```mermaid 
-flowchat
-st=>start: 客户端发送消息
-e=>end: 结束
-op1=>operation: 业务队列
-op2=>operation: 消费者消费
-op3=>operation: 死信队列
-cond1=>condition: 是否消费成功
-cond2=>condition: 队列是否配置死信队列
-
-st->op1->op2->cond1
-cond1(yes)->e
-cond1(no)->cond2
-cond2(yes)->op3
-cond2(no, bottom)->e
-```

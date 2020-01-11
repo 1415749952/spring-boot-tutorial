@@ -247,6 +247,9 @@ Hibernate: insert into user (password, username) values (?, ?)
 数据库一直都是系统高性能的一个瓶颈，合理正确地使用缓存，可以大大提升系统性能。
 但是随之而来的是系统复杂度提高，有更多的问题需要处理，比如缓存一致性，缓存穿透，缓存雪崩等。
 
+### 参考
+ - <https://blog.battcn.com/2018/05/13/springboot/v2-cache-redis/>
+
 ### 扩展
 #### 根据条件操作缓存
 根据条件操作缓存内容并不影响数据库操作，条件表达式返回一个布尔值，true/false，当条件为true，则进行缓存操作，否则直接调用方法执行的返回结果。

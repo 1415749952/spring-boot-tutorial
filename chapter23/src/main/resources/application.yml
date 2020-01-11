@@ -2,7 +2,7 @@ spring:
   cache:
     type: redis
   datasource:
-    url: jdbc:mysql://49.235.247.175:3306/test
+    url: jdbc:mysql://127.0.0.1:3306/test
     driver-class-name: com.mysql.jdbc.Driver
     username: test
     password: 123456
@@ -15,7 +15,7 @@ spring:
       ddl-auto: none
     open-in-view: true
   redis:
-    host: 49.235.247.175
+    host: 127.0.0.1
     password: 123456
     # 连接超时时间（毫秒）
     timeout: 10000

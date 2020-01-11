@@ -1,6 +1,6 @@
 spring:
   redis:
-    host: 49.235.247.175
+    host: 127.0.0.1
     password: 123456
     # 连接超时时间（毫秒）
     timeout: 10000

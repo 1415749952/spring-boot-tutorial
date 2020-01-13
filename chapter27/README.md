@@ -1,15 +1,40 @@
-二十六、整合SpringSecurity之自定义结构登录鉴权
+二十七、整合SpringSecurity之前后端分离Token鉴权
 ---
 
 ### 相关知识
+目前大部分项目都使用了前后端分离的架构模式，
+因为客户端不再是单纯的网页，还可以是手机，平板，公众号，小程序等等，
+很重要的是，不是每一个客户端都能够支持 session+cookie 的模式，于是，token 模式开始大行其道，
+其实 token 跟 session+cookie 模式本质上是一样的，只是 cookie 由浏览器定义了客户端存储模式，这对于不是浏览器的客户端则行不通，而 token 则需要客户端自行存储，客户端可以根据自已的特性进行差别化存储。
 
+使用 Token 进行前后端交互鉴权的流程
+登录流程
+```mermaid
+sequenceDiagram
+客户端 ->> AuthenticationFilter: 发起登录
+AuthenticationFilter->>AuthenticationFilter: 生成token
+AuthenticationFilter->>SuccessHandler: 鉴权成功
+SuccessHandler-->>TokenRepository: 存储Token
+AuthenticationFilter->>FailureHandler: 鉴权失败
+SuccessHandler->>客户端 : token
+```
+
+鉴权流程
+```mermaid
+sequenceDiagram
+客户端 ->> TokenFilter: 发起请求
+TokenFilter->>TokenFilter: 从Header中获取Token
+TokenFilter->>TokenRepository: 获取用户信息
+TokenRepository->>TokenFilter: 
+TokenFilter->>SpringSecurity: 将用户信息加载至
+TokenFilter->>Controller:  
+```
 
 ### 目标
-默认情况下，SpringSecurity 提供了用户名/密码的登录方式，但实际应用中，登录方式多种多样，可以用手机号/短信验证码，也可以第三方授权等。
-本章将整合 SpringSecurity 实现使用自定义格式进行登录，并使用 json 方式进行前后端交互。
+整合 SpringSecurity 实现使用 token 进行鉴权。
 
 ### 准备工作
-创建用户表 `user`、角色表 `role`、用户角色关系表 `user_role`
+创建用户表 `user`、角色表 `role`、用户角色关系表 `user_role` 及 `token` 表
 
 ```mysql
 CREATE TABLE `role` (
@@ -32,6 +57,13 @@ CREATE TABLE `user_role` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`,`role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关系表';
+
+CREATE TABLE `token` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `token` varchar(128) NOT NULL COMMENT 'token',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='token';
 ```
 
 ### 操作步骤
@@ -125,6 +157,8 @@ public class User implements UserDetails {
     private String password;
     @TableField(exist = false)
     private List<Role> roleList;
+    @TableField(exist = false)
+    private String token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -160,16 +194,25 @@ public class User implements UserDetails {
 @AllArgsConstructor
 @TableName("user_role")
 public class UserRole {
-
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long userId;
     private Long roleId;
-
+}
+```
+Token实体
+```java
+@Data
+@TableName("token")
+public class Token {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    private String token;
+    private Long userId;
 }
 ```
 ##### Repository 层
-分别为三个实体类添加 Mapper
+分别为四个实体类添加 Mapper
 ```java
 @Mapper
 public interface RoleRepository extends BaseMapper<Role> {
@@ -179,6 +222,9 @@ public interface UserRepository extends BaseMapper<User> {
 }
 @Mapper
 public interface UserRoleRepository extends BaseMapper<UserRole> {
+}
+@Mapper
+public interface TokenRepository extends BaseMapper<Token> {
 }
 ```
 #### 权限配置
@@ -226,14 +272,19 @@ public class LoginDto {
 }
 ```
 
-##### 自定义登录过滤器
+##### 自定义登录鉴权过滤器
 继承 SpringSecurity 提供的 AbstractAuthenticationProcessingFilter 类，实现 attemptAuthentication 方法，用于登录校验。
-本例中，模拟前端使用 json 格式传递参数，所以通过 objectMapper.readValue 的方式从流中获取入参，之后借用了用户名密码登录的校验，并返回权限对象
+本例中，模拟前端使用 json 格式传递参数，所以通过 objectMapper.readValue 的方式从流中获取入参，之后借用了用户名密码登录的校验，
+如果鉴权成功，则生成 token 存库并将 token 返回给前端。
 ```java
 @Data
 public class JsonAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
+    @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private TokenRepository tokenRepository;
 
     public JsonAuthenticationFilter() {
         super(new AntPathRequestMatcher("/login", "POST"));
@@ -244,10 +295,19 @@ public class JsonAuthenticationFilter extends AbstractAuthenticationProcessingFi
             throws AuthenticationException, IOException, ServletException {
         // 从输入流中获取到登录的信息
         try {
-            LoginDto loginUser = objectMapper.readValue(request.getInputStream(), LoginDto.class);
-            return getAuthenticationManager().authenticate(
+            LoginDto loginUser = new ObjectMapper().readValue(request.getInputStream(), LoginDto.class);
+            Authentication authenticate = getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(loginUser.getMobile(), loginUser.getPassword())
             );
+            if (authenticate.isAuthenticated()) {
+                User user = (User) authenticate.getPrincipal();
+                Token token = new Token();
+                token.setToken(UUID.randomUUID().toString());
+                token.setUserId(user.getId());
+                tokenRepository.insert(token);
+                user.setToken(token.getToken());
+            }
+            return authenticate;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -325,8 +385,54 @@ public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
 }
 ```
 
+##### 自定义 Token 验证过滤器
+客户端登录成功时，后台会把生成的 token 返回给前端，之后客户端每次请求后台接口将会把这个 token 附在 header 头中传递给后台，
+后台会验证这个 token 是否有效，如果有效就把用户信息加载至 SpringSecurity 中，如果无效则会跳转至上一步提供 AuthenticationEntryPoint 进行处理。
+```java
+public class TokenAuthenticationFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String tokenStr = request.getHeader("token");
+        if (tokenStr != null && !tokenStr.isEmpty()) {
+            Token tokenDb = tokenRepository.selectOne(new QueryWrapper<Token>().lambda().eq(Token::getToken, tokenStr));
+            if (tokenDb != null && tokenDb.getUserId() != null) {
+                User user = userRepository.selectById(tokenDb.getUserId());
+                if (user == null) {
+                    throw new UsernameNotFoundException("token已失效");
+                }
+                List<UserRole> userRoles = userRoleRepository.selectList(new QueryWrapper<UserRole>().lambda().eq(UserRole::getUserId, user.getId()));
+                if (userRoles != null && !userRoles.isEmpty()) {
+                    List<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+                    List<Role> roles = roleRepository.selectList(new QueryWrapper<Role>().lambda().in(Role::getId, roleIds));
+                    user.setRoleList(roles);
+                }
+                user.setToken(tokenStr);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                logger.info(String.format("Authenticated user %s, setting security context", user.getUsername()));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+
+}
+```
+
 ##### 注册
-在 configure 方法中调用 addFilterAfter 方法，将自定义的 jsonAuthenticationFilter 注册进 SpringSecurity 的过滤器链中。
+在 configure 方法中将自定义的 jsonAuthenticationFilter 及 tokenAuthenticationFilter 注册进 SpringSecurity 的过滤器链中，
+并禁用 session。
 ```java
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
@@ -346,18 +452,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated()
-            .and().csrf().disable()
-            .addFilterAfter(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling()
-            .authenticationEntryPoint(new JsonAuthenticationEntryPoint())
-            .accessDeniedHandler(new JsonAccessDeniedHandler());
+            .and()
+                // 禁用 csrf
+                .csrf().disable()
+                // 禁用 session
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+                .exceptionHandling()
+                    .authenticationEntryPoint(new JsonAuthenticationEntryPoint())
+                    .accessDeniedHandler(new JsonAccessDeniedHandler())
+            .and()
+                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+        return new TokenAuthenticationFilter();
     }
 
     @Bean
     public JsonAuthenticationFilter jsonAuthenticationFilter() throws Exception {
         JsonAuthenticationFilter filter = new JsonAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManager());
-        filter.setObjectMapper(this.objectMapper);
         filter.setAuthenticationSuccessHandler(jsonLoginSuccessHandler());
         filter.setAuthenticationFailureHandler(new JsonLoginFailureHandler());
         return filter;
@@ -429,4 +546,4 @@ public class SecurityTest {
 本章源码 : <https://gitee.com/gongm_24/spring-boot-tutorial.git>
 
 ### 结束语
-SpringSecurity 提供的登录校验较为局限，不能满足生产需求，了解了自定义入参，即可以为每一个登录接口进行定制化校验。
+前端后分离后，使用 token 代替 session 进行鉴权，本例中使用数据库进行 token 的存储，也可以考虑使用更高效的中间件进行代替，如 redis。

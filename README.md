@@ -24,7 +24,9 @@
  - [第二十二章：整合Redis之实现分布式锁](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter22)
  - [第二十三章：整合Redis之集成缓存SpringDataCache](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter23)
  - [第二十四章：整合SpringSecurity之最简登录及方法鉴权](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter24)
- - [第二十五章：整合SpringSecurity之](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter25)
+ - [第二十五章：整合SpringSecurity之使用数据库实现登录鉴权](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter25)
+ - [第二十六章：整合SpringSecurity之自定义登录鉴权](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter26)
+ - [第二十七章：整合SpringSecurity之前后端分离Token鉴权](https://gitee.com/gongm_24/spring-boot-tutorial/tree/master/chapter27)
  
 ### 参考资料 
 官方样例：<https://github.com/ityouknow/spring-boot-examples>

@@ -1,4 +1,4 @@
-二十三、整合SpringSecurity之最简登录及方法鉴权
+二十四、整合SpringSecurity之最简登录及方法鉴权
 ---
 
 ### 目标
